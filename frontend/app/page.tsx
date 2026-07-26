@@ -7,6 +7,7 @@ import Security from "@/components/landing/Security";
 import AISection from "@/components/landing/AISection";
 import FAQ from "@/components/landing/FAQ";
 import CTA from "@/components/landing/CTA";
+import Footer from "@/components/shared/Footer";
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
       <AISection />
       <FAQ />
       <CTA />
+      <Footer />
     </>
   );
 }
