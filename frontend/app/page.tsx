@@ -4,6 +4,7 @@ import HowItWorks from "@/components/landing/HowItWorks";
 import Hero from "@/components/landing/Hero";
 import Navbar from "@/components/shared/Navbar";
 import Security from "@/components/landing/Security";
+import AISection from "@/components/landing/AISection";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       <Features />
       <HowItWorks />
       <Security />
+      <AISection />
     </>
   );
 }
