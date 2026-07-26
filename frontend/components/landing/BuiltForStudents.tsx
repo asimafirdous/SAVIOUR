@@ -7,6 +7,8 @@ import {
   BadgeCheck,
 } from "lucide-react";
 
+import SectionHeading from "@/components/ui/SectionHeading";
+
 const items = [
   {
     icon: Briefcase,
@@ -38,16 +40,9 @@ export default function BuiltForStudents() {
   return (
     <section className="bg-slate-50 py-24">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="text-center">
-          <h2 className="text-4xl font-bold text-slate-900">
-            Built for students chasing opportunities.
-          </h2>
-
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
-            SAVIOUR keeps your career opportunities organized, so you can focus
-            on preparing instead of searching.
-          </p>
-        </div>
+        <SectionHeading
+        title="Built for students chasing opportunities."
+        description="SAVIOUR keeps your career opportunities organized, so you can focus on preparing instead of searching."/>
 
         <div className="mt-16 grid grid-cols-2 gap-6 md:grid-cols-3">
           {items.map((item) => {

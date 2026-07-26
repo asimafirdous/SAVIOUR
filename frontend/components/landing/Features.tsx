@@ -7,6 +7,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import SectionHeading from "@/components/ui/SectionHeading";
+
 const features = [
   {
     icon: Mail,
@@ -50,18 +52,12 @@ export default function Features() {
   return (
     <section id="features" className="bg-white py-24">
       <div className="mx-auto max-w-7xl px-6">
-        {/* Section Heading */}
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-slate-900 lg:text-5xl">
-            Everything you need to stay one step ahead.
-          </h2>
 
-          <p className="mt-5 text-lg leading-8 text-slate-600">
-            SAVIOUR keeps your opportunities organized, your deadlines visible,
-            and your next step always clear—so you can focus on achieving your
-            goals.
-          </p>
-        </div>
+        {/* Section Heading */}
+        <SectionHeading
+          title="Everything you need to stay one step ahead."
+          description="SAVIOUR keeps your opportunities organized, your deadlines visible, and your next step always clear—so you can focus on achieving your goals."
+        />
 
         {/* Feature Cards */}
         <div className="mt-20 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -94,6 +90,7 @@ export default function Features() {
             );
           })}
         </div>
+
       </div>
     </section>
   );
