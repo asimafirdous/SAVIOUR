@@ -6,6 +6,7 @@ import Navbar from "@/components/shared/Navbar";
 import Security from "@/components/landing/Security";
 import AISection from "@/components/landing/AISection";
 import FAQ from "@/components/landing/FAQ";
+import CTA from "@/components/landing/CTA";
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       <Security />
       <AISection />
       <FAQ />
+      <CTA />
     </>
   );
 }
