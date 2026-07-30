@@ -1,111 +1,92 @@
-import {
-  Bot,
-  CalendarClock,
-  Sparkles,
-} from "lucide-react";
-
-import SectionHeading from "@/components/ui/SectionHeading";
-
 export default function AISection() {
   return (
-    <section id="ai" className="bg-slate-50 py-24">
-      <div className="mx-auto max-w-7xl px-6">
+    <section className="relative overflow-hidden px-6 py-24">
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-white via-emerald-50/50 to-teal-50/40" />
+      <div className="absolute left-10 top-10 -z-10 h-72 w-72 rounded-full bg-emerald-200/30 blur-3xl" />
+      <div className="absolute bottom-10 right-10 -z-10 h-80 w-80 rounded-full bg-teal-200/30 blur-3xl" />
 
-        <SectionHeading
-          title="Meet your AI career assistant."
-          description="SAVIOUR understands your opportunities, summarizes important emails, and helps you decide what needs attention."
-        />
-
-
-        {/* AI Preview */}
-        <div className="mx-auto mt-16 max-w-4xl rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
-
-          {/* Header */}
-          <div className="flex items-center gap-4 border-b border-slate-200 pb-6">
-
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-100">
-              <Bot
-                className="text-indigo-600"
-                size={26}
-              />
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold text-slate-900">
-                SAVIOUR AI
-              </h3>
-
-              <p className="text-sm text-slate-500">
-                Your personal career assistant
-              </p>
-            </div>
-
+      <div className="mx-auto max-w-6xl">
+        <div className="text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/70 px-4 py-2 text-sm font-medium text-emerald-700 backdrop-blur-md">
+            ✨ AI Powered
           </div>
 
+          <h2 className="mt-5 text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+            Meet your AI career assistant.
+          </h2>
 
-          {/* AI Message */}
-          <div className="mt-8 rounded-2xl bg-slate-50 p-6">
-
-            <div className="flex gap-3">
-
-              <Sparkles
-                className="mt-1 text-indigo-600"
-                size={22}
-              />
-
-              <p className="leading-7 text-slate-700">
-                Hey Asima 👋
-                <br />
-                I found 3 important opportunities from your inbox that need
-                your attention.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          {/* Opportunity Card */}
-          <div className="mt-6 rounded-2xl border border-slate-200 p-6">
-
-            <div className="flex items-center gap-3">
-
-              <CalendarClock
-                className="text-indigo-600"
-                size={24}
-              />
-
-              <h4 className="font-semibold text-slate-900">
-                Google Software Engineering Internship
-              </h4>
-
-            </div>
-
-
-            <div className="mt-4 space-y-2 text-slate-600">
-
-              <p>
-                ⏰ Deadline: Tomorrow, 11:59 PM
-              </p>
-
-              <p>
-                🎯 AI Recommendation:
-                Apply today. Your skills match this opportunity.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          {/* Fake Input */}
-          <div className="mt-6 rounded-xl border border-slate-200 px-5 py-4 text-slate-400">
-            Ask SAVIOUR anything about your opportunities...
-          </div>
-
-
+          <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-slate-600">
+            SAVIOUR understands your opportunities, summarizes important emails,
+            and helps you decide what needs attention next.
+          </p>
         </div>
 
+        <div className="mt-14 flex justify-center">
+          <div className="glass w-full max-w-2xl overflow-hidden rounded-[32px] border border-white/40 shadow-2xl shadow-emerald-100/40">
+            <div className="border-b border-emerald-100 bg-white/60 px-6 py-5 backdrop-blur-md">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-xl text-white shadow-lg shadow-emerald-500/25">
+                  ✨
+                </div>
+
+                <div>
+                  <p className="font-semibold text-slate-900">SAVIOUR AI</p>
+                  <p className="text-sm text-slate-500">
+                    Your personal career assistant
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-5 bg-gradient-to-b from-white/80 to-white/60 p-6 backdrop-blur-md">
+              <div className="rounded-3xl border border-emerald-100 bg-white/80 p-5 shadow-sm">
+                <p className="font-semibold text-slate-900">Hey Asima 👋</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  I found 3 important opportunities from your inbox that need
+                  your attention.
+                </p>
+              </div>
+
+              <div className="rounded-3xl border border-emerald-100 bg-white/80 p-5 shadow-sm">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-semibold text-slate-900">
+                      Google Software Engineering Internship
+                    </p>
+
+                    <p className="mt-1 text-sm text-emerald-700">
+                      ⏰ Deadline: Tomorrow, 11:59 PM
+                    </p>
+                  </div>
+
+                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                    High Priority
+                  </span>
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
+                  <p className="text-sm font-medium text-emerald-800">
+                    🎯 AI Recommendation
+                  </p>
+
+                  <p className="mt-1 text-sm leading-6 text-emerald-700">
+                    Apply today. Your skills match this opportunity and the
+                    deadline is very close.
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-emerald-100 bg-white/80 p-4 shadow-sm">
+                <div className="flex items-center gap-3 rounded-2xl border border-emerald-100 bg-white px-4 py-3">
+                  <span className="text-slate-400">⌨️</span>
+                  <p className="text-sm text-slate-500">
+                    Ask SAVIOUR anything about your opportunities...
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

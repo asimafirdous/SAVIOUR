@@ -1,79 +1,72 @@
-import {
-  Mail,
-  Brain,
-  Rocket,
-} from "lucide-react";
-
-import SectionHeading from "@/components/ui/SectionHeading";
-
 const steps = [
   {
     number: "01",
-    icon: Mail,
     title: "Connect Gmail",
-    description:
-      "Securely connect your Gmail account using Google OAuth. We only use read-only access.",
+    desc: "Securely connect your Gmail account using Google OAuth. We only use read-only access.",
   },
   {
     number: "02",
-    icon: Brain,
     title: "AI Understands",
-    description:
-      "SAVIOUR analyzes your career emails and identifies internships, deadlines, interviews, and opportunities.",
+    desc: "SAVIOUR analyzes your career emails and identifies internships, deadlines, interviews, and opportunities.",
   },
   {
     number: "03",
-    icon: Rocket,
     title: "Stay Ahead",
-    description:
-      "Get reminders, summaries, and a clear view of what needs your attention next.",
+    desc: "Get reminders, summaries, and a clear view of what needs your attention next.",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="bg-slate-50 py-24">
+    <section id="how-it-works" className="relative overflow-hidden py-24">
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-emerald-50/70 to-white" />
+
       <div className="mx-auto max-w-7xl px-6">
-
-        <SectionHeading
-          title="From your inbox to your opportunities."
-          description="SAVIOUR turns scattered emails into organized actions, helping you focus on what matters."
-        />
-
-        <div className="mt-16 grid gap-8 md:grid-cols-3">
-          {steps.map((step) => {
-            const Icon = step.icon;
-
-            return (
-              <div
-                key={step.number}
-                className="relative rounded-3xl bg-white p-8 shadow-sm border border-slate-200"
-              >
-
-                <span className="text-sm font-semibold text-indigo-600">
-                  {step.number}
-                </span>
-
-                <div className="mt-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100">
-                  <Icon
-                    size={28}
-                    className="text-indigo-600"
-                  />
-                </div>
-
-                <h3 className="mt-6 text-xl font-semibold text-slate-900">
-                  {step.title}
-                </h3>
-
-                <p className="mt-3 leading-7 text-slate-600">
-                  {step.description}
-                </p>
-
-              </div>
-            );
-          })}
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm text-emerald-800">
+            🧭 How it works
+          </div>
+          <h2 className="mt-5 text-4xl font-black tracking-tight text-slate-900 md:text-5xl">
+            From your inbox to your
+            <span className="text-gradient"> opportunities.</span>
+          </h2>
+          <p className="mt-5 text-lg leading-8 text-slate-600">
+            SAVIOUR turns scattered emails into organized actions, helping you
+            focus on what matters.
+          </p>
         </div>
 
+        <div className="mt-16 grid gap-8 lg:grid-cols-3">
+          {steps.map((step, index) => (
+            <div
+              key={step.number}
+              className={`card-3d reveal relative rounded-3xl p-8 ${index === 1 ? "reveal-delay-1" : index === 2 ? "reveal-delay-2" : ""}`}
+            >
+              <div className="absolute right-6 top-6 text-5xl font-black text-emerald-100">
+                {step.number}
+              </div>
+
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-xl font-bold text-white shadow-lg">
+                {step.number}
+              </div>
+
+              <h3 className="mt-6 text-2xl font-bold text-slate-900">
+                {step.title}
+              </h3>
+
+              <p className="mt-4 leading-7 text-slate-600">
+                {step.desc}
+              </p>
+
+              <div className="mt-8 h-1 w-full overflow-hidden rounded-full bg-emerald-100">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"
+                  style={{ width: index === 0 ? "70%" : index === 1 ? "85%" : "100%" }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

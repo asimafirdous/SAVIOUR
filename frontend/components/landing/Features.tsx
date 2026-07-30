@@ -1,50 +1,33 @@
-import {
-  Bell,
-  Brain,
-  CalendarClock,
-  LayoutDashboard,
-  Mail,
-  ShieldCheck,
-} from "lucide-react";
-
-import SectionHeading from "@/components/ui/SectionHeading";
-
 const features = [
   {
-    icon: Mail,
     title: "Smart Inbox",
-    description:
-      "Automatically finds internships, placements, scholarships, interviews, and hackathons from your Gmail.",
+    desc: "Automatically finds internships, placements, scholarships, interviews, and hackathons from your Gmail.",
+    icon: "📬",
   },
   {
-    icon: CalendarClock,
     title: "Deadline Tracker",
-    description:
-      "Keep every important application deadline, assessment, and event organized in one timeline.",
+    desc: "Keep every important application deadline, assessment, and event organized in one timeline.",
+    icon: "⏰",
   },
   {
-    icon: Brain,
     title: "Career Assistant",
-    description:
-      "Get AI-powered summaries, recommendations, and quick answers from your career-related emails.",
+    desc: "Get AI-powered summaries, recommendations, and quick answers from your career-related emails.",
+    icon: "✨",
   },
   {
-    icon: Bell,
     title: "Smart Reminders",
-    description:
-      "Receive timely reminders before deadlines so you never miss an opportunity.",
+    desc: "Receive timely reminders before deadlines so you never miss an opportunity.",
+    icon: "🔔",
   },
   {
-    icon: LayoutDashboard,
     title: "Opportunity Hub",
-    description:
-      "View internships, interviews, applications, and opportunities from one unified dashboard.",
+    desc: "View internships, interviews, applications, and opportunities from one unified dashboard.",
+    icon: "📊",
   },
   {
-    icon: ShieldCheck,
     title: "Privacy First",
-    description:
-      "Secure Google OAuth, read-only Gmail access, and complete control over your connected account.",
+    desc: "Secure Google OAuth, read-only Gmail access, and complete control over your connected account.",
+    icon: "🔒",
   },
 ];
 
@@ -52,45 +35,46 @@ export default function Features() {
   return (
     <section id="features" className="bg-white py-24">
       <div className="mx-auto max-w-7xl px-6">
-
-        {/* Section Heading */}
-        <SectionHeading
-          title="Everything you need to stay one step ahead."
-          description="SAVIOUR keeps your opportunities organized, your deadlines visible, and your next step always clear—so you can focus on achieving your goals."
-        />
-
-        {/* Feature Cards */}
-        <div className="mt-20 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => {
-            const Icon = feature.icon;
-
-            return (
-              <div
-                key={feature.title}
-                className="group rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-indigo-300 hover:shadow-xl"
-              >
-                {/* Icon */}
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 transition-colors duration-300 group-hover:bg-indigo-600">
-                  <Icon
-                    size={28}
-                    className="text-indigo-600 transition-colors duration-300 group-hover:text-white"
-                  />
-                </div>
-
-                {/* Title */}
-                <h3 className="mt-6 text-xl font-semibold text-slate-900">
-                  {feature.title}
-                </h3>
-
-                {/* Description */}
-                <p className="mt-3 leading-7 text-slate-600">
-                  {feature.description}
-                </p>
-              </div>
-            );
-          })}
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm text-emerald-800">
+            ⚡ Product Features
+          </div>
+          <h2 className="mt-5 text-4xl font-black tracking-tight text-slate-900 md:text-5xl">
+            Everything you need to stay
+            <span className="text-gradient"> one step ahead.</span>
+          </h2>
+          <p className="mt-5 text-lg leading-8 text-slate-600">
+            SAVIOUR keeps your opportunities organized, your deadlines visible,
+            and your next step always clear—so you can focus on achieving your
+            goals.
+          </p>
         </div>
 
+        <div className="mt-16 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {features.map((feature, index) => (
+            <div
+              key={feature.title}
+              className={`card-3d reveal rounded-3xl p-7 ${index % 3 === 1 ? "reveal-delay-1" : index % 3 === 2 ? "reveal-delay-2" : ""}`}
+            >
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-2xl text-white shadow-lg">
+                {feature.icon}
+              </div>
+
+              <h3 className="mt-6 text-xl font-bold text-slate-900">
+                {feature.title}
+              </h3>
+
+              <p className="mt-3 leading-7 text-slate-600">
+                {feature.desc}
+              </p>
+
+              <div className="mt-6 flex items-center gap-2 text-sm font-semibold text-emerald-700">
+                Learn more
+                <span>→</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
