@@ -1,4 +1,5 @@
 import "./globals.css";
+import SessionProvider from "@/components/providers/SessionProvider";
 
 export default function RootLayout({
   children,
@@ -6,10 +7,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+    <html lang="en">
+      <body>
+        <SessionProvider>{children}</SessionProvider>
+      </body>
     </html>
   );
 }
-
-<html lang="en" data-scroll-behavior="smooth"></html>

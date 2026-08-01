@@ -21,52 +21,61 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     async signIn({ user, account }) {
-      try {
-        if (account?.provider === "google") {
-          console.log("GOOGLE USER:", user);
-
-          await prisma.user.upsert({
-            where: {
-              email: user.email!,
-            },
-
-            update: {
-              name: user.name ?? "",
-              profilePicture: user.image ?? null,
-              googleId: account.providerAccountId,
-              lastLoginAt: new Date(),
-            },
-
-            create: {
-              email: user.email!,
-              name: user.name ?? "",
-              profilePicture: user.image ?? null,
-              googleId: account.providerAccountId,
-              lastLoginAt: new Date(),
-            },
-          });
-        }
-
-        return true;
-      } catch (error) {
-        console.error("AUTH ERROR:", error);
+      if (!user.email || !account?.providerAccountId) {
         return false;
       }
+
+      const dbUser = await prisma.user.upsert({
+        where: { email: user.email },
+        update: {
+          name: user.name ?? "",
+          profilePicture: user.image ?? null,
+          lastLoginAt: new Date(),
+        },
+        create: {
+          email: user.email,
+          googleId: account.providerAccountId,
+          name: user.name ?? "",
+          profilePicture: user.image ?? null,
+          lastLoginAt: new Date(),
+        },
+      });
+
+      await prisma.account.upsert({
+        where: {
+          provider_providerAccountId: {
+            provider: "google",
+            providerAccountId: account.providerAccountId,
+          },
+        },
+        update: {
+          access_token: account.access_token,
+          refresh_token: account.refresh_token,
+          expires_at: account.expires_at,
+          scope: account.scope,
+          token_type: account.token_type,
+          type: "oauth",
+        },
+        create: {
+          userId: dbUser.id,
+          provider: "google",
+          providerAccountId: account.providerAccountId,
+          type: "oauth",
+          access_token: account.access_token,
+          refresh_token: account.refresh_token,
+          expires_at: account.expires_at,
+          scope: account.scope,
+          token_type: account.token_type,
+        },
+      });
+
+      return true;
     },
 
-    async session({ session }) {
-      if (session.user?.email) {
-        const dbUser = await prisma.user.findUnique({
-          where: {
-            email: session.user.email,
-          },
-        });
-
-        if (dbUser) {
-          session.user.id = dbUser.id;
-        }
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.sub!;
       }
-
       return session;
     },
   },
