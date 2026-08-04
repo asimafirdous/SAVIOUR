@@ -86,6 +86,7 @@ model Reminder {
   completed Boolean @default(false)
 
   createdAt DateTime @default(now())
+  @@unique([userId, title])
 }
 
 model Account {

@@ -26,15 +26,33 @@ export default function DashboardClient({
   const syncGmail = async () => {
     try {
       setSyncing(true);
+      setMessage("Hold tight!! Syncing important career emails…");
 
-      await fetch("/api/sync/gmail", {
+      const res = await fetch("/api/sync/gmail", {
         method: "POST",
       });
-
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Sync failed");
+      }
+      setMessage(data.message || "Sync complete");
       window.location.reload();
+
+      // Poll every 3 seconds for updates
+      const start = Date.now();
+      const poll = async () => {
+        const res = await fetch("/api/auth/session");
+        if (res.ok) {
+          // Refresh dashboard data
+          window.location.reload();
+        } else if (Date.now() - start < 30000) {
+          setTimeout(poll, 3000);
+        }
+      };
+      setTimeout(poll, 3000);
     } catch (error) {
       console.error(error);
-    } finally {
+      setMessage("Failed to start sync");
       setSyncing(false);
     }
   };
@@ -68,13 +86,6 @@ export default function DashboardClient({
     }
   };
 
-  // Auto sync once when dashboard opens
-  useEffect(() => {
-    if (!lastSyncAt && !syncing) {
-      syncGmail();
-    }
-  }, [lastSyncAt]);
-
   return (
     <div className="px-4 py-4 sm:px-6 max-w-7xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
@@ -87,13 +98,13 @@ export default function DashboardClient({
 
           <p className="text-xs text-gray-500 mt-1">
             {lastSyncAt
-              ? `Last synced ${new Date(lastSyncAt).toLocaleTimeString('en-IN', {
+              ? `Last synced ${new Date(lastSyncAt).toLocaleTimeString("en-IN", {
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: true,
                 timeZone: 'Asia/Kolkata',
               })}`
-              : "Syncing Gmail for the first time..."}
+              : "Click Sync Gmail to import your recent career emails"}
           </p>
         </div>
 
@@ -106,8 +117,9 @@ export default function DashboardClient({
             size={16}
             className={syncing ? "animate-spin" : ""}
           />
-          {syncing ? "Syncing..." : "Sync Gmail"}
+          {syncing ? "Syncing in background…" : "Sync Gmail"}
         </button>
+
         {message && (
           <div className="rounded-2xl bg-emerald-50 border border-emerald-100 px-4 py-3 text-sm text-emerald-700">
             {message}

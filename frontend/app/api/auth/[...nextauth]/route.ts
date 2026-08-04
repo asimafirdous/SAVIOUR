@@ -9,15 +9,27 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
+          access_type: "offline",
+          prompt: "consent",
           scope:
             "openid email profile https://www.googleapis.com/auth/gmail.readonly",
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
         },
       },
     }),
   ],
+
+  pages: {
+    signIn: "/login",
+  },
+
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
+  },
+
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60,
+  },
 
   callbacks: {
     async signIn({ user, account }) {
@@ -80,36 +92,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.sub!;
       }
-
       return session;
-    },
-  },
-
-  pages: {
-    signIn: "/login",
-  },
-
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
-  },
-
-  jwt: {
-    maxAge: 30 * 24 * 60 * 60,
-  },
-
-  cookies: {
-    sessionToken: {
-      name:
-        process.env.NODE_ENV === "production"
-          ? "__Secure-next-auth.session-token"
-          : "next-auth.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
     },
   },
 

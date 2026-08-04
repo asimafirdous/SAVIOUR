@@ -16,7 +16,7 @@ export default function ResetSyncButton() {
     try {
       setLoading(true);
 
-      const res = await fetch("/api/settings/reset-sync", {
+      const res = await fetch("/api/reset-sync", {
         method: "POST",
       });
 

@@ -51,45 +51,57 @@ function decodeBody(payload: any): string {
 
 function inferStatus(text: string): string {
   const content = text.toLowerCase();
-
-  if (
-    content.includes("interview") ||
-    content.includes("schedule your interview") ||
-    content.includes("technical round") ||
-    content.includes("hr round")
-  ) {
-    return "Interview";
-  }
-
-  if (
-    content.includes("online assessment") ||
-    content.includes("assessment link") ||
-    content.includes("coding challenge") ||
-    content.includes("hackerrank") ||
-    content.includes("codility") ||
-    content.includes("test link")
-  ) {
-    return "OA Pending";
-  }
-
-  if (
-    content.includes("offer") ||
-    content.includes("congratulations") ||
-    content.includes("selected") ||
-    content.includes("welcome aboard")
-  ) {
-    return "Offer";
-  }
-
-  if (
-    content.includes("rejected") ||
-    content.includes("not moving forward") ||
+  // Rejection first (highest priority)
+  if (content.includes("not moving forward") ||
     content.includes("not selected") ||
-    content.includes("unfortunately")
+    content.includes("application rejected") ||
+    content.includes("rejected") ||
+    content.includes("didn't meet our criteria") ||
+    content.includes("did not meet our criteria") ||
+    content.includes("we found that you didn't meet") ||
+    content.includes("we found that you did not meet")
   ) {
     return "Rejected";
   }
 
+  // Offer
+  if (content.includes("offer letter") ||
+    content.includes("congratulations") ||
+    content.includes("welcome aboard") ||
+    content.includes("selected for the role")
+  ) {
+    return "Offer";
+  }
+
+  // Interview
+  if (content.includes("interview scheduled") ||
+    content.includes("schedule your interview") ||
+    content.includes("technical interview") ||
+    content.includes("hr interview") ||
+    content.includes("interview round") ||
+    content.includes("ai interview")
+  ) {
+    return "Interview";
+  }
+
+  // OA
+  if (content.includes("online assessment") ||
+    content.includes("assessment link") ||
+    content.includes("coding challenge") ||
+    content.includes("hackerrank") ||
+    content.includes("codility") ||
+    content.includes("test link")) {
+    return "OA Pending";
+  }
+
+  // Application received
+  if (content.includes("application received") ||
+    content.includes("thanks for applying") ||
+    content.includes("your application has been submitted") ||
+    content.includes("application submitted")
+  ) {
+    return "Applied";
+  }
   return "Applied";
 }
 
@@ -166,26 +178,96 @@ function isImportantCareerEmail(
 
   // Must contain a real career signal
   const careerSignals = [
+    // application lifecycle
     "application received",
     "thanks for applying",
+    "your application",
+    "application submitted",
     "complete your application",
+
+    // assessments
     "online assessment",
     "assessment link",
     "coding challenge",
-    "hackerrank",
-    "codility",
-    "interview",
-    "schedule",
-    "shortlisted",
-    "selected",
-    "offer",
-    "rejected",
+    "hackerrank test",
+    "codility test",
+    "test link",
+
+    // interviews
+    "interview scheduled",
+    "schedule your interview",
+    "technical interview",
+    "hr interview",
+    "interview round",
+
+    // results
+    "you are shortlisted",
+    "shortlisted for",
+    "selected for",
+    "offer letter",
+    "congratulations",
     "not selected",
-    "recruiter",
-    "hiring team",
+    "not moving forward",
+    "application rejected",
   ];
 
+  const hardBlock = [
+    "learn today",
+    "build tomorrow",
+    "still thinking about",
+    "recommended for you",
+    "job alert",
+    "expiring on",
+    "webinar",
+    "workshop",
+    "masterclass",
+    "newsletter",
+    "weekly digest",
+  ];
+
+  if (hardBlock.some((x) => text.includes(x))) {
+    return false;
+  }
+
   return careerSignals.some((s) => text.includes(s));
+}
+
+function isFutureDate(date: Date | null) {
+  if (!date) return false;
+
+  const now = new Date();
+  const sixtyDays = new Date();
+  sixtyDays.setDate(now.getDate() + 60);
+
+  return date > now && date <= sixtyDays;
+}
+
+function isExpired(date: Date | null) {
+  return date ? date < new Date() : false;
+}
+
+function isMeetingInvite(subject: string, body: string, from: string) {
+  const text = `${subject} ${body} ${from}`.toLowerCase();
+  const meetingSignals = [
+    "zoom",
+    "google meet",
+    "meet.google.com",
+    "microsoft teams",
+    "teams.microsoft.com",
+    "calendar invitation",
+    "invited you to a meeting",
+    "join meeting",
+    "meeting link",
+    "scheduled meeting",
+    "interview call",
+    "zoom meeting",
+    "zoom invitation",
+    "join zoom meeting",
+    "no-reply@zoom.us",
+    "calendar-noreply@google.com"
+  ];
+
+  return meetingSignals.some((s) => text.includes(s));
 }
 
 export async function POST() {
@@ -211,12 +293,6 @@ export async function POST() {
         { status: 404 }
       );
     }
-
-    // Update last sync time
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastSyncAt: new Date() },
-    });
 
     const account = await prisma.account.findFirst({
       where: {
@@ -269,20 +345,22 @@ export async function POST() {
       auth: oauth2,
     });
 
+    const query = user.lastSyncAt
+      ? `
+    after:${Math.floor(user.lastSyncAt.getTime() / 1000)}
+    -category:promotions
+    -category:social
+    `
+      : `
+    newer_than:30d
+    -category:promotions
+    -category:social 
+    `;
+
     const list = await gmail.users.messages.list({
       userId: "me",
-      q: `
-        newer_than:30d
-        category:primary
-        -category:promotions
-        -category:social
-        -category:updates
-        -from:(jobs-noreply@linkedin.com)
-        -from:(notifications@linkedin.com)
-        -from:(discover@)
-        -from:(newsletter@)
-      `.replace(/\\s+/g, " ").trim(),
-      maxResults: 50,
+      q: query.replace(/\\s+/g, " ").trim(),
+      maxResults: 25,
     });
 
     const messages = list.data.messages || [];
@@ -293,9 +371,12 @@ export async function POST() {
     for (const message of messages) {
       if (!message.id) continue;
 
+      // Fetch full Gmail message
       const full = await gmail.users.messages.get({
         userId: "me",
         id: message.id,
+        format: "metadata",
+        metadataHeaders: ["Subject", "From", "Date"],
       });
 
       const headers = full.data.payload?.headers || [];
@@ -304,14 +385,39 @@ export async function POST() {
       const from = getHeader(headers, "From");
       const body = decodeBody(full.data.payload);
 
-      // Skip non-important emails completely
+      // Handle meeting invites separately
+      if (isMeetingInvite(subject, body, from)) {
+        const meetingDate = chrono.parseDate(body);
+        if (meetingDate && meetingDate > new Date()) {
+          const key = `meeting-${subject}-${meetingDate.toISOString()}`;
+          const existing = await prisma.reminder.findFirst({
+            where: {
+              userId: user.id, description: key,
+            },
+          });
+          if (!existing) {
+            await prisma.reminder.create({
+              data: {
+                userId: user.id,
+                title: `Meeting: ${subject}`,
+                description: key,
+                dueDate: meetingDate,
+                priority: "High",
+              },
+            });
+          }
+        } continue;
+      }
+
+      // Skip non-important emails
       if (!isImportantCareerEmail(subject, body, from)) {
         continue;
       }
 
+      // AI summary for inbox
       const aiEmail = summarizeEmail(subject, body);
 
-      // Save email
+      // Save or update email
       const email = await prisma.email.upsert({
         where: { gmailId: message.id },
         update: {
@@ -335,85 +441,105 @@ export async function POST() {
 
       syncedEmails++;
 
-      // AI extraction
-const ai = await extractOpportunityDetails({
-  subject,
-  content: body,
-  sender: from,
-});
+      // Extract opportunity details
+      const ai = await extractOpportunityDetails({
+        subject,
+        content: body,
+        sender: from,
+      });
 
-const company = ai.company || extractCompany(from);
-const role = ai.role || subject;
+      const company = ai.company || extractCompany(from);
+      const role = ai.role || subject;
 
-const detectedStatus = inferStatus(`${subject} ${body}`);
+      // Detect application status
+      const detectedStatus = inferStatus(`${subject} ${body}`);
 
-const status =
-  ai.status && ai.status !== "Unknown"
-    ? ai.status
-    : detectedStatus;
+      const status =
+        ai.status && ai.status !== "Unknown"
+          ? ai.status
+          : detectedStatus;
 
-const parsedDate = chrono.parseDate(body);
+      // Parse deadline
+      const parsedDate = chrono.parseDate(body);
 
-const validDeadline =
-  parsedDate &&
-  parsedDate.getFullYear() >= 2025 &&
-  parsedDate.getFullYear() <= 2035
-    ? parsedDate
-    : null;
+      const validDeadline =
+        parsedDate &&
+          parsedDate.getFullYear() >= 2025 &&
+          parsedDate.getFullYear() <= 2035
+          ? parsedDate
+          : null;
 
-const deadline = ai.deadline
-  ? new Date(ai.deadline)
-  : validDeadline;
+      const deadline = ai.deadline
+        ? new Date(ai.deadline)
+        : validDeadline;
 
-const existingOpportunity =
-  await prisma.opportunity.findFirst({
-    where: {
-      userId: user.id,
-      company,
-      title: role,
-    },
-  });
+      // Ignore old deadlines
+      if (isExpired(deadline)) {
+        continue;
+      }
 
-const finalStatus = existingOpportunity
-  ? getBetterStatus(existingOpportunity.status, status)
-  : status;
+      // Find existing opportunity
+      const existingOpportunity = await prisma.opportunity.findFirst({
+        where: {
+          userId: user.id,
+          company,
+          title: role,
+        },
+      });
 
-if (existingOpportunity) {
-  await prisma.opportunity.update({
-    where: { id: existingOpportunity.id },
-    data: {
-      emailId: email.id,
-      sourceEmail: from,
-      status: finalStatus,
-      deadline: deadline ?? existingOpportunity.deadline,
-    },
-  });
-} else {
-  await prisma.opportunity.create({
-    data: {
-      userId: user.id,
-      emailId: email.id,
-      company,
-      title: role,
-      sourceEmail: from,
-      status: finalStatus,
-      deadline,
-    },
-  });
+      // Keep the most advanced status
+      const finalStatus = existingOpportunity
+        ? getBetterStatus(existingOpportunity.status, status)
+        : status;
 
-  createdOpportunities++;
-}
-      // Auto reminders (deduplicated)
-      if (deadline) {
-        const reminderKey = `${company}-${role}-${deadline.toISOString().split("T")[0]}`;
+      // Create or update opportunity
+      if (existingOpportunity) {
+        await prisma.opportunity.update({
+          where: { id: existingOpportunity.id },
+          data: {
+            emailId: email.id,
+            sourceEmail: from,
+            status: finalStatus,
+            deadline: deadline ?? existingOpportunity.deadline,
+          },
+        });
+      } else {
+        await prisma.opportunity.create({
+          data: {
+            userId: user.id,
+            emailId: email.id,
+            company,
+            title: role,
+            sourceEmail: from,
+            status: finalStatus,
+            deadline,
+          },
+        });
 
-        const existingReminder =
-          await prisma.reminder.findFirst({
-            where: {
-              userId: user.id,
-              description: reminderKey,
-            },
-          });
+        createdOpportunities++;
+      }
+
+      if (finalStatus === "Rejected") {
+        await prisma.reminder.deleteMany({
+          where: {
+            userId: user.id,
+            title: `${company} - ${role}`,
+          },
+        });
+      }
+
+      // Create reminder only for future deadlines
+      if (isFutureDate(deadline)) {
+        const safeDeadline = deadline as Date;
+
+        const reminderKey = `${company}-${role}-${safeDeadline.toISOString().split("T")[0]}`;
+
+        const existingReminder = await prisma.reminder.findFirst({
+          where: {
+            userId: user.id,
+            description: reminderKey,
+          },
+        });
 
         if (!existingReminder) {
           await prisma.reminder.create({
@@ -421,7 +547,7 @@ if (existingOpportunity) {
               userId: user.id,
               title: `${company} - ${role}`,
               description: reminderKey,
-              dueDate: deadline,
+              dueDate: safeDeadline,
               priority:
                 finalStatus === "Interview" ||
                   finalStatus === "OA Pending"
@@ -433,20 +559,21 @@ if (existingOpportunity) {
       }
     }
 
+    // Mark sync successful only after all emails are processed
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastSyncAt: new Date() },
+    });
+
     return NextResponse.json({
       success: true,
       message: `Synced ${syncedEmails} important emails and created ${createdOpportunities} opportunities`,
     });
-  } catch (error: any) {
-    console.error(error);
-
+  } catch (error) {
+    console.error("Error syncing Gmail:", error);
     return NextResponse.json(
-      {
-        error: error.message || "Gmail sync failed",
-      },
-      {
-        status: 500,
-      }
+      { error: "Failed to sync Gmail" },
+      { status: 500 }
     );
   }
 }
