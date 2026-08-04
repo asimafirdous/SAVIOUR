@@ -21,15 +21,14 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     async signIn({ user, account }) {
-      if (!user.email || !account?.providerAccountId) {
-        return false;
-      }
+      if (!user.email || !account?.providerAccountId) return false;
 
       const dbUser = await prisma.user.upsert({
         where: { email: user.email },
         update: {
           name: user.name ?? "",
           profilePicture: user.image ?? null,
+          googleId: account.providerAccountId,
           lastLoginAt: new Date(),
         },
         create: {
@@ -48,19 +47,20 @@ export const authOptions: NextAuthOptions = {
             providerAccountId: account.providerAccountId,
           },
         },
+
         update: {
           access_token: account.access_token,
           refresh_token: account.refresh_token,
           expires_at: account.expires_at,
           scope: account.scope,
           token_type: account.token_type,
-          type: "oauth",
         },
+
         create: {
           userId: dbUser.id,
+          type: "oauth",
           provider: "google",
           providerAccountId: account.providerAccountId,
-          type: "oauth",
           access_token: account.access_token,
           refresh_token: account.refresh_token,
           expires_at: account.expires_at,
@@ -72,16 +72,45 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
 
+    async jwt({ token }) {
+      return token;
+    },
+
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub!;
       }
+
       return session;
     },
   },
 
   pages: {
     signIn: "/login",
+  },
+
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
+  },
+
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60,
+  },
+
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-next-auth.session-token"
+          : "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
   },
 
   secret: process.env.NEXTAUTH_SECRET,
