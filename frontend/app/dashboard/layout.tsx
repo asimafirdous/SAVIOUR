@@ -12,12 +12,15 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-[#F6FAF8]">
+      {/* Desktop sidebar */}
       <Sidebar session={session} />
 
-      <main className="flex-1 pb-20 md:pb-0">
+      {/* Main content */}
+      <main className="flex-1 pb-20 md:pb-0 overflow-x-hidden">
         {children}
       </main>
 
+      {/* Mobile bottom navigation */}
       <MobileNav />
     </div>
   );
