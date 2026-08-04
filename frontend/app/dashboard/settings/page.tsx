@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { ShieldCheck, RefreshCw, PauseCircle, Trash2 } from "lucide-react";
+import ResetSyncButton from "./ResetSyncButton";
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
@@ -91,10 +92,15 @@ export default async function SettingsPage() {
             </p>
           </div>
 
-          <button className="inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">
-            <Trash2 size={16} />
-            Reset
-          </button>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Reset synced data</p>
+              <p className="text-sm text-gray-500">
+                Remove opportunities, reminders, and inbox summaries
+              </p>
+            </div>
+            <ResetSyncButton />
+          </div>
         </div>
       </section>
 
