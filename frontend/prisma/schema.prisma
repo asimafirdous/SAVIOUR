@@ -52,24 +52,19 @@ model Email {
 }
 
 model Opportunity {
-  id String @id @default(cuid())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  emailId String?
-
-  company String
-  title   String
-
-  status String @default("Applied")
-
-  deadline DateTime?
-
+  id          String   @id @default(cuid())
+  userId      String
+  emailId     String?
+  company     String
+  title       String
   sourceEmail String?
+  status      String
+  deadline    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user  User  @relation(fields: [userId], references: [id])
+  email Email? @relation(fields: [emailId], references: [id])
 
   @@unique([userId, company, title])
 }

@@ -336,78 +336,73 @@ export async function POST() {
       syncedEmails++;
 
       // AI extraction
-      const ai = await extractOpportunityDetails({
-        subject,
-        content: body,
-        sender: from,
-      });
+const ai = await extractOpportunityDetails({
+  subject,
+  content: body,
+  sender: from,
+});
 
-      const company = ai.company || extractCompany(from);
-      const role = ai.role || subject;
+const company = ai.company || extractCompany(from);
+const role = ai.role || subject;
 
-      const detectedStatus = inferStatus(`${subject} ${body}`);
+const detectedStatus = inferStatus(`${subject} ${body}`);
 
-      const status =
-        ai.status && ai.status !== "Unknown"
-          ? ai.status
-          : detectedStatus;
+const status =
+  ai.status && ai.status !== "Unknown"
+    ? ai.status
+    : detectedStatus;
 
-      const existingOpportunity =
-        await prisma.opportunity.findFirst({
-          where: {
-            userId: user.id,
-            company,
-            title: role,
-          },
-        });
+const parsedDate = chrono.parseDate(body);
 
-      const finalStatus = existingOpportunity
-        ? getBetterStatus(existingOpportunity.status, status)
-        : status;
+const validDeadline =
+  parsedDate &&
+  parsedDate.getFullYear() >= 2025 &&
+  parsedDate.getFullYear() <= 2035
+    ? parsedDate
+    : null;
 
-      const parsedDate = chrono.parseDate(body);
-      const validDeadline =
+const deadline = ai.deadline
+  ? new Date(ai.deadline)
+  : validDeadline;
 
-        parsedDate &&
+const existingOpportunity =
+  await prisma.opportunity.findFirst({
+    where: {
+      userId: user.id,
+      company,
+      title: role,
+    },
+  });
 
-          parsedDate.getFullYear() >= 2025 &&
+const finalStatus = existingOpportunity
+  ? getBetterStatus(existingOpportunity.status, status)
+  : status;
 
-          parsedDate.getFullYear() <= 2035
+if (existingOpportunity) {
+  await prisma.opportunity.update({
+    where: { id: existingOpportunity.id },
+    data: {
+      emailId: email.id,
+      sourceEmail: from,
+      status: finalStatus,
+      deadline: deadline ?? existingOpportunity.deadline,
+    },
+  });
+} else {
+  await prisma.opportunity.create({
+    data: {
+      userId: user.id,
+      emailId: email.id,
+      company,
+      title: role,
+      sourceEmail: from,
+      status: finalStatus,
+      deadline,
+    },
+  });
 
-          ? parsedDate :
-
-          null;
-
-      const deadline = ai.deadline
-        ? new Date(ai.deadline)
-        : validDeadline;
-
-      if (existingOpportunity) {
-        await prisma.opportunity.update({
-          where: { id: existingOpportunity.id },
-          data: {
-            emailId: email.id,
-            sourceEmail: from,
-            status: finalStatus,
-            deadline: deadline ?? existingOpportunity.deadline,
-          },
-        });
-      } else {
-        await prisma.opportunity.create({
-          data: {
-            userId: user.id,
-            emailId: email.id,
-            company,
-            title: role,
-            sourceEmail: from,
-            status: finalStatus,
-            deadline,
-          },
-        });
-
-        createdOpportunities++;
-      }
-
+  createdOpportunities++;
+}
       // Auto reminders (deduplicated)
       if (deadline) {
         const reminderKey = `${company}-${role}-${deadline.toISOString().split("T")[0]}`;

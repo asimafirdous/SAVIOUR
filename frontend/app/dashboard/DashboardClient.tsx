@@ -13,13 +13,15 @@ import {
 
 export default function DashboardClient({
   session,
-  opportunities = [],
+  opportunities: initialOpportunities = [],
   emails = [],
   reminders = [],
   stats,
   lastSyncAt,
 }: any) {
   const [syncing, setSyncing] = useState(false);
+  const [opportunities, setOpportunities] = useState(initialOpportunities);
+  const [message, setMessage] = useState("");
 
   const syncGmail = async () => {
     try {
@@ -37,12 +39,41 @@ export default function DashboardClient({
     }
   };
 
+  const updateStatus = async (id: string, status: string) => {
+    try {
+      const res = await fetch(`/api/opportunities/${id}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update status");
+      }
+
+      setOpportunities((prev: any[]) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, status } : item
+        )
+      );
+
+      setMessage("Status updated successfully");
+
+      setTimeout(() => setMessage(""), 2000);
+    } catch (error) {
+      console.error(error);
+      setMessage("Failed to update status");
+    }
+  };
+
   // Auto sync once when dashboard opens
   useEffect(() => {
-    if (!lastSyncAt) {
+    if (!lastSyncAt && !syncing) {
       syncGmail();
     }
-  }, []);
+  }, [lastSyncAt]);
 
   return (
     <div className="px-4 py-4 sm:px-6 max-w-7xl mx-auto space-y-8">
@@ -56,9 +87,12 @@ export default function DashboardClient({
 
           <p className="text-xs text-gray-500 mt-1">
             {lastSyncAt
-              ? `Last synced ${new Date(lastSyncAt)
-                .toISOString()
-                .slice(11, 16)}`
+              ? `Last synced ${new Date(lastSyncAt).toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+                timeZone: 'Asia/Kolkata',
+              })}`
               : "Syncing Gmail for the first time..."}
           </p>
         </div>
@@ -74,6 +108,11 @@ export default function DashboardClient({
           />
           {syncing ? "Syncing..." : "Sync Gmail"}
         </button>
+        {message && (
+          <div className="rounded-2xl bg-emerald-50 border border-emerald-100 px-4 py-3 text-sm text-emerald-700">
+            {message}
+          </div>
+        )}
       </div>
 
       <section className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 p-8 text-white shadow-xl">
@@ -119,7 +158,7 @@ export default function DashboardClient({
           </div>
 
           <Link
-            href="/dashboard/inbox"
+            href="/dashboard/opportunities"
             className="text-sm font-medium text-emerald-700 hover:underline"
           >
             View all
@@ -194,7 +233,7 @@ export default function DashboardClient({
           </div>
 
           <div className="space-y-3">
-            {opportunities.length === 0 ? (
+            {initialOpportunities.length === 0 ? (
               <p className="text-gray-500 text-sm">
                 No opportunities yet.
               </p>
@@ -215,9 +254,26 @@ export default function DashboardClient({
                       </p>
                     </div>
 
-                    <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700 whitespace-nowrap">
-                      {item.status}
-                    </span>
+                    <select
+                      value={item.status}
+                      onChange={(e) => updateStatus(item.id, e.target.value)}
+                      className={`rounded-full px-3 py-1 text-xs font-medium border outline-none ${item.status === "Offer"
+                        ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                        : item.status === "Rejected"
+                          ? "bg-red-100 text-red-700 border-red-200"
+                          : item.status === "Interview"
+                            ? "bg-blue-100 text-blue-700 border-blue-200"
+                            : item.status === "OA Pending"
+                              ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+                              : "bg-gray-100 text-gray-700 border-gray-200"
+                        }`}
+                    >
+                      <option>Applied</option>
+                      <option>OA Pending</option>
+                      <option>Interview</option>
+                      <option>Offer</option>
+                      <option>Rejected</option>
+                    </select>
                   </div>
                 </div>
               ))
@@ -265,7 +321,7 @@ export default function DashboardClient({
                     </div>
 
                     <span
-                      className={`px-3 py-1 text-xs font-medium rounded-xl ${item.priority === "High"
+                      className={`px-3 py-1 text-xs font-medium rounded-full ${item.priority === "High"
                         ? "bg-red-100 text-red-700"
                         : "bg-yellow-100 text-yellow-700"
                         }`}
