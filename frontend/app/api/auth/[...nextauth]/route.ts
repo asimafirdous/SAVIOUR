@@ -11,6 +11,7 @@ export const authOptions: NextAuthOptions = {
         params: {
           access_type: "offline",
           scope: "openid email profile https://www.googleapis.com/auth/gmail.readonly",
+          prompt: 'consent',
         },
       },
     }),
@@ -64,6 +65,7 @@ export const authOptions: NextAuthOptions = {
           expires_at: account.expires_at,
           scope: account.scope,
           token_type: account.token_type,
+          id_token: account.id_token,
         },
 
         create: {
@@ -76,6 +78,7 @@ export const authOptions: NextAuthOptions = {
           expires_at: account.expires_at,
           scope: account.scope,
           token_type: account.token_type,
+          id_token: account.id_token,
         },
       });
 
