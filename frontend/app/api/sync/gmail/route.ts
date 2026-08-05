@@ -3,9 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { google } from "googleapis";
-import { extractOpportunityDetails } from "@/lib/ai";
-import { summarizeEmail } from "@/lib/email-summary";
-import * as chrono from "chrono-node";
+import { analyzeEmail, extractDate } from "@/lib/ai";
 
 function extractCompany(from: string) {
   const match = from.match(/<(.*)>/);
@@ -51,59 +49,41 @@ function decodeBody(payload: any): string {
 
 function inferStatus(text: string): string {
   const content = text.toLowerCase();
-  // Rejection first (highest priority)
-  if (content.includes("not moving forward") ||
-    content.includes("not selected") ||
-    content.includes("application rejected") ||
+
+  if (
     content.includes("rejected") ||
-    content.includes("didn't meet our criteria") ||
-    content.includes("did not meet our criteria") ||
-    content.includes("we found that you didn't meet") ||
-    content.includes("we found that you did not meet")
+    content.includes("not selected") ||
+    content.includes("not moving forward")
   ) {
     return "Rejected";
   }
 
-  // Offer
-  if (content.includes("offer letter") ||
-    content.includes("congratulations") ||
+  if (
+    content.includes("offer letter") ||
     content.includes("welcome aboard") ||
-    content.includes("selected for the role")
+    content.includes("selected")
   ) {
     return "Offer";
   }
 
-  // Interview
-  if (content.includes("interview scheduled") ||
-    content.includes("schedule your interview") ||
-    content.includes("technical interview") ||
-    content.includes("hr interview") ||
-    content.includes("interview round") ||
-    content.includes("ai interview")
+  if (
+    content.includes("interview") ||
+    content.includes("schedule your interview")
   ) {
     return "Interview";
   }
 
-  // OA
-  if (content.includes("online assessment") ||
-    content.includes("assessment link") ||
+  if (
+    content.includes("assessment") ||
     content.includes("coding challenge") ||
-    content.includes("hackerrank") ||
-    content.includes("codility") ||
-    content.includes("test link")) {
+    content.includes("hackerrank")
+  ) {
     return "OA Pending";
   }
 
-  // Application received
-  if (content.includes("application received") ||
-    content.includes("thanks for applying") ||
-    content.includes("your application has been submitted") ||
-    content.includes("application submitted")
-  ) {
-    return "Applied";
-  }
   return "Applied";
 }
+
 
 const STATUS_ORDER = {
   Applied: 1,
@@ -113,161 +93,26 @@ const STATUS_ORDER = {
   Offer: 5,
 };
 
-function getBetterStatus(current: string, next: string) {
+
+function getBetterStatus(
+  current: string,
+  next: string
+) {
   return STATUS_ORDER[next as keyof typeof STATUS_ORDER] >
     STATUS_ORDER[current as keyof typeof STATUS_ORDER]
     ? next
     : current;
 }
 
-function isImportantCareerEmail(
-  subject: string,
-  body: string,
-  from: string
-) {
-  const text = `${subject} ${body} ${from}`.toLowerCase();
-
-  // Block promotions / spam / alerts
-  const blocked = [
-    // Promotions / newsletters
-    "newsletter",
-    "digest",
-    "unsubscribe",
-    "sale",
-    "discount",
-    "offer ends",
-    "coupon",
-    "cashback",
-
-    // Job recommendations
-    "naukri",
-    "recommended jobs",
-    "top openings",
-    "urgent requirement",
-    "hiring for intern",
-    "job opportunities for intern",
-
-    // Webinars / workshops
-    "workshop",
-    "webinar",
-    "learning session",
-    "build your first",
-    "how to get an sde",
-
-    // Security / account
-    "new sign-in",
-    "account",
-    "password",
-    "security alert",
-
-    // Billing
-    "upgrade your account",
-    "invoice",
-    "payment",
-    "aws",
-
-    // Calendar invites
-    "updated invitation",
-    "sync call",
-    "weekly from",
-  ];
-
-  if (blocked.some((b) => text.includes(b))) {
-    return false;
-  }
-
-  // Must contain a real career signal
-  const careerSignals = [
-    // application lifecycle
-    "application received",
-    "thanks for applying",
-    "your application",
-    "application submitted",
-    "complete your application",
-
-    // assessments
-    "online assessment",
-    "assessment link",
-    "coding challenge",
-    "hackerrank test",
-    "codility test",
-    "test link",
-
-    // interviews
-    "interview scheduled",
-    "schedule your interview",
-    "technical interview",
-    "hr interview",
-    "interview round",
-
-    // results
-    "you are shortlisted",
-    "shortlisted for",
-    "selected for",
-    "offer letter",
-    "congratulations",
-    "not selected",
-    "not moving forward",
-    "application rejected",
-  ];
-
-  const hardBlock = [
-    "learn today",
-    "build tomorrow",
-    "still thinking about",
-    "recommended for you",
-    "job alert",
-    "expiring on",
-    "webinar",
-    "workshop",
-    "masterclass",
-    "newsletter",
-    "weekly digest",
-  ];
-
-  if (hardBlock.some((x) => text.includes(x))) {
-    return false;
-  }
-
-  return careerSignals.some((s) => text.includes(s));
-}
-
 function isFutureDate(date: Date | null) {
   if (!date) return false;
 
   const now = new Date();
+
   const sixtyDays = new Date();
   sixtyDays.setDate(now.getDate() + 60);
 
   return date > now && date <= sixtyDays;
-}
-
-function isExpired(date: Date | null) {
-  return date ? date < new Date() : false;
-}
-
-function isMeetingInvite(subject: string, body: string, from: string) {
-  const text = `${subject} ${body} ${from}`.toLowerCase();
-  const meetingSignals = [
-    "zoom",
-    "google meet",
-    "meet.google.com",
-    "microsoft teams",
-    "teams.microsoft.com",
-    "calendar invitation",
-    "invited you to a meeting",
-    "join meeting",
-    "meeting link",
-    "scheduled meeting",
-    "interview call",
-    "zoom meeting",
-    "zoom invitation",
-    "join zoom meeting",
-    "no-reply@zoom.us",
-    "calendar-noreply@google.com"
-  ];
-
-  return meetingSignals.some((s) => text.includes(s));
 }
 
 export async function POST() {
@@ -346,21 +191,13 @@ export async function POST() {
     });
 
     const query = user.lastSyncAt
-      ? `
-    after:${Math.floor(user.lastSyncAt.getTime() / 1000)}
-    -category:promotions
-    -category:social
-    `
-      : `
-    newer_than:30d
-    -category:promotions
-    -category:social 
-    `;
+      ? `after:${Math.floor(user.lastSyncAt.getTime() / 1000)}`
+      : `newer_than:30d`;
 
     const list = await gmail.users.messages.list({
       userId: "me",
       q: query.replace(/\\s+/g, " ").trim(),
-      maxResults: 10,
+      maxResults: 50,
     });
 
     const messages = list.data.messages || [];
@@ -375,8 +212,7 @@ export async function POST() {
       const full = await gmail.users.messages.get({
         userId: "me",
         id: message.id,
-        format: "metadata",
-        metadataHeaders: ["Subject", "From", "Date"],
+        format: "full",
       });
 
       const headers = full.data.payload?.headers || [];
@@ -385,100 +221,89 @@ export async function POST() {
       const from = getHeader(headers, "From");
       const body = decodeBody(full.data.payload);
 
-      // Handle meeting invites separately
-      if (isMeetingInvite(subject, body, from)) {
-        const meetingDate = chrono.parseDate(body);
-        if (meetingDate && meetingDate > new Date()) {
-          const key = `meeting-${subject}-${meetingDate.toISOString()}`;
-          const existing = await prisma.reminder.findFirst({
-            where: {
-              userId: user.id, description: key,
-            },
-          });
-          if (!existing) {
-            await prisma.reminder.create({
-              data: {
-                userId: user.id,
-                title: `Meeting: ${subject}`,
-                description: key,
-                dueDate: meetingDate,
-                priority: "High",
-              },
-            });
-          }
-        } continue;
-      }
+      // AI analysis
+      const ai = await analyzeEmail(
+        subject,
+        from,
+        body
+      );
 
-      // Skip non-important emails
-      if (!isImportantCareerEmail(subject, body, from)) {
+      if (
+        !ai.isCareerRelated &&
+        ai.category !== "meeting"
+      ) {
         continue;
       }
 
-      // AI summary for inbox
-      const aiEmail = summarizeEmail(subject, body);
+      const detectedDate =
+        extractDate(ai.deadlineText)
+        ??
+        extractDate(ai.meetingText)
+        ??
+        extractDate(body);
 
-      // Save or update email
       const email = await prisma.email.upsert({
-        where: { gmailId: message.id },
+        where: {
+          gmailId: message.id,
+        },
+
         update: {
           content: body,
-          summary: aiEmail.summary,
-          actionRequired: aiEmail.actionRequired,
-          priority: aiEmail.priority,
-          gmailUrl: `https://mail.google.com/mail/u/0/#all/${message.id}`,
+          summary: ai.summary,
+          actionRequired: ai.actionRequired,
+          priority: ai.importance,
+          gmailUrl:
+            `https://mail.google.com/mail/u/0/#all/${message.id}`,
         },
+
         create: {
           userId: user.id,
           gmailId: message.id,
-          gmailUrl: `https://mail.google.com/mail/u/0/#all/${message.id}`,
+
+          gmailUrl:
+            `https://mail.google.com/mail/u/0/#all/${message.id}`,
+
           sender: from,
           subject,
+
           content: body,
-          processed: false,
-          summary: aiEmail.summary,
-          actionRequired: aiEmail.actionRequired,
-          priority: aiEmail.priority,
+
+          processed: true,
+
+          summary: ai.summary,
+
+          actionRequired:
+            ai.actionRequired,
+
+          priority:
+            ai.importance,
         },
       });
 
       syncedEmails++;
 
-      // Extract opportunity details
-      const ai = await extractOpportunityDetails({
-        subject,
-        content: body,
-        sender: from,
-      });
-
-      const company = ai.company || extractCompany(from);
-      const role = ai.role || subject;
-
-      // Detect application status
-      const detectedStatus = inferStatus(`${subject} ${body}`);
+      const company =
+        ai.company ||
+        extractCompany(from);
 
       const status =
         ai.status && ai.status !== "Unknown"
           ? ai.status
-          : detectedStatus;
+          : inferStatus(`${subject} ${body}`);
 
-      // Parse deadline
-      const parsedDate = chrono.parseDate(body);
+      const role =
+        ai.role ||
+        ai.title ||
+        subject;
+
+
+      const deadline =
+        detectedDate;
 
       const validDeadline =
-        parsedDate &&
-          parsedDate.getFullYear() >= 2025 &&
-          parsedDate.getFullYear() <= 2035
-          ? parsedDate
+        deadline && deadline > new Date()
+          ? deadline
           : null;
-
-      const deadline = ai.deadline
-        ? new Date(ai.deadline)
-        : validDeadline;
-
-      // Ignore old deadlines
-      if (isExpired(deadline)) {
-        continue;
-      }
 
       // Find existing opportunity
       const existingOpportunity = await prisma.opportunity.findFirst({
@@ -502,7 +327,9 @@ export async function POST() {
             emailId: email.id,
             sourceEmail: from,
             status: finalStatus,
-            deadline: deadline ?? existingOpportunity.deadline,
+            deadline:
+              validDeadline ??
+              existingOpportunity.deadline,
           },
         });
       } else {
@@ -514,7 +341,7 @@ export async function POST() {
             title: role,
             sourceEmail: from,
             status: finalStatus,
-            deadline,
+            deadline: validDeadline,
           },
         });
 
@@ -531,8 +358,8 @@ export async function POST() {
       }
 
       // Create reminder only for future deadlines
-      if (isFutureDate(deadline)) {
-        const safeDeadline = deadline as Date;
+      if (isFutureDate(validDeadline)) {
+        const safeDeadline = validDeadline as Date;
 
         const reminderKey = `${company}-${role}-${safeDeadline.toISOString().split("T")[0]}`;
 
@@ -551,10 +378,11 @@ export async function POST() {
               description: reminderKey,
               dueDate: safeDeadline,
               priority:
-                finalStatus === "Interview" ||
-                  finalStatus === "OA Pending"
+                ai.importance === "high"
                   ? "High"
-                  : "Medium",
+                  : ai.importance === "medium"
+                    ? "Medium"
+                    : "Low",
             },
           });
         }

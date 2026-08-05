@@ -7,9 +7,6 @@ export default function AISection() {
 
       <div className="mx-auto max-w-6xl">
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/70 px-4 py-2 text-sm font-medium text-emerald-700 backdrop-blur-md">
-            ✨ AI Powered
-          </div>
 
           <h2 className="mt-5 text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
             Meet your AI career assistant.

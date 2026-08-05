@@ -85,15 +85,36 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
 
-    async jwt({ token }) {
+    async jwt({ token, user }) {
+      if (user) {
+        token.email = user.email;
+        token.name = user.name;
+        token.picture = user.image;
+      }
+
       return token;
     },
 
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.sub!;
+        session.user.id = token.sub ?? "";
+        session.user.email = token.email as string;
+        session.user.name = token.name;
+        session.user.image = token.picture;
       }
       return session;
+    },
+  },
+
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
     },
   },
 
