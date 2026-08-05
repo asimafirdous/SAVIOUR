@@ -34,11 +34,11 @@ export default async function DeadlinesPage() {
   const now = new Date();
 
   const upcoming = opportunities.filter(
-    (o) => o.deadline && o.deadline >= now
+    (o: any) => o.deadline && o.deadline >= now
   );
 
   const past = opportunities.filter(
-    (o) => o.deadline && o.deadline < now
+    (o: any) => o.deadline && o.deadline < now
   );
 
   return (
@@ -64,7 +64,7 @@ export default async function DeadlinesPage() {
           <p className="text-sm text-gray-500">No upcoming deadlines.</p>
         ) : (
           <div className="space-y-3">
-            {upcoming.map((item) => (
+            {upcoming.map((item: (typeof opportunities)[number]) => (
               <div
                 key={item.id}
                 className="rounded-2xl border p-4 flex items-center justify-between gap-4"
@@ -98,7 +98,7 @@ export default async function DeadlinesPage() {
           </h2>
 
           <div className="space-y-3">
-            {past.map((item) => (
+            {past.map((item: (typeof opportunities)[number]) => (
               <div
                 key={item.id}
                 className="rounded-2xl border p-4 flex items-center justify-between gap-4 opacity-75"
