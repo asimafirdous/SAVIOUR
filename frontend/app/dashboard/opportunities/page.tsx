@@ -93,7 +93,7 @@ export default async function OpportunitiesPage() {
                       Empty
                     </div>
                   ) : (
-                    items.map((item) => (
+                    items.map((item: (typeof opportunities)[number]) => (
                       <div
                         key={item.id}
                         className="rounded-2xl border p-4 hover:shadow-md transition bg-white"
