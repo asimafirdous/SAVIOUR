@@ -23,9 +23,6 @@ export default function HowItWorks() {
 
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm text-emerald-800">
-            🧭 How it works
-          </div>
           <h2 className="mt-5 text-4xl font-black tracking-tight text-slate-900 md:text-5xl">
             From your inbox to your
             <span className="text-gradient"> opportunities.</span>

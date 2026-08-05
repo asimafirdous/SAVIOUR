@@ -21,9 +21,12 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
 
+  useSecureCookies: process.env.NODE_ENV === "production",
+
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60,   // refresh token every 24h
   },
 
   jwt: {
@@ -87,6 +90,7 @@ export const authOptions: NextAuthOptions = {
 
     async jwt({ token, user }) {
       if (user) {
+        token.id = user.id;
         token.email = user.email;
         token.name = user.name;
         token.picture = user.image;
@@ -97,23 +101,28 @@ export const authOptions: NextAuthOptions = {
 
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.sub ?? "";
+        session.user.id = token.id as string;
         session.user.email = token.email as string;
-        session.user.name = token.name;
-        session.user.image = token.picture;
+        session.user.name = token.name as string;
+        session.user.image = token.picture as string;
       }
+
       return session;
     },
   },
 
   cookies: {
     sessionToken: {
-      name: "next-auth.session-token",
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-next-auth.session-token"
+          : "next-auth.session-token",
       options: {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
+        maxAge: 30 * 24 * 60 * 60,
       },
     },
   },

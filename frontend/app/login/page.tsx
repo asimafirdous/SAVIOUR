@@ -4,14 +4,37 @@ import { signIn } from "next-auth/react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#F6FAF8] p-6">
       <div className="w-full max-w-md rounded-3xl border bg-white p-8 shadow-xl">
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-2xl text-white">
-            🛡️
+
+          <div className="mx-auto mb-6 flex flex-col items-center">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-3xl bg-emerald-400/30 blur-2xl" />
+
+              <div className="relative flex h-16 w-16 items-center justify-center rounded-3xl bg-white ring-1 ring-emerald-100 shadow-2xl shadow-emerald-200/50">
+                <Image
+                  src="/images/logo.png"
+                  alt="SAVIOUR Logo"
+                  width={42}
+                  height={42}
+                  className="object-contain"
+                  priority
+                />
+              </div>
+            </div>
+
+            <p className="mt-4 text-lg font-black tracking-[0.22em] text-slate-900">
+              SAVIOUR
+            </p>
+
+            <p className="mt-1 text-sm font-medium text-emerald-600">
+              Never let the door close on you.
+            </p>
           </div>
 
           <h1 className="text-3xl font-bold text-gray-900">

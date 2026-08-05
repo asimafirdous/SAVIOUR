@@ -197,7 +197,7 @@ export async function POST() {
     const list = await gmail.users.messages.list({
       userId: "me",
       q: query.replace(/\\s+/g, " ").trim(),
-      maxResults: 50,
+      maxResults: 10,
     });
 
     const messages = list.data.messages || [];
@@ -221,12 +221,27 @@ export async function POST() {
       const from = getHeader(headers, "From");
       const body = decodeBody(full.data.payload);
 
-      // AI analysis
-      const ai = await analyzeEmail(
-        subject,
-        from,
-        body
-      );
+      await new Promise((resolve) => setTimeout(resolve, 600));
+
+      let ai;
+
+      try {
+        ai = await analyzeEmail(subject, from, body);
+      } catch (err: any) {
+        console.error("AI failed, using fallback:", err.message);
+
+        ai = {
+          isCareerRelated: true,
+          category: "other",
+          importance: "medium",
+          title: subject,
+          company: extractCompany(from),
+          actionRequired: null,
+          deadlineText: null,
+          meetingText: null,
+          summary: body.slice(0, 120),
+        };
+      }
 
       if (
         !ai.isCareerRelated &&

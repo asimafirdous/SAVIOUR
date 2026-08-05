@@ -36,9 +36,6 @@ export default function FAQ() {
 
       <div className="mx-auto max-w-4xl">
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/70 px-4 py-2 text-sm font-medium text-emerald-700 backdrop-blur-md">
-            ❓ FAQ
-          </div>
 
           <h2 className="mt-5 text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
             Frequently asked questions.
@@ -68,18 +65,16 @@ export default function FAQ() {
                   </span>
 
                   <span
-                    className={`flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-emerald-700 transition-transform duration-300 ${
-                      open ? "rotate-45" : ""
-                    }`}
+                    className={`flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-emerald-700 transition-transform duration-300 ${open ? "rotate-45" : ""
+                      }`}
                   >
                     +
                   </span>
                 </button>
 
                 <div
-                  className={`grid transition-all duration-300 ${
-                    open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-                  }`}
+                  className={`grid transition-all duration-300 ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                    }`}
                 >
                   <div className="overflow-hidden">
                     <div className="border-t border-emerald-100/70 px-6 pb-6 pt-4">

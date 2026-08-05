@@ -31,23 +31,26 @@ export default function DashboardClient({
   const syncGmail = async () => {
     try {
       setSyncing(true);
-      setMessage("Hold tight!! Syncing important career emails…");
+      setSyncMessage("Hold tight!! Syncing important career emails…");
 
       const res = await fetch("/api/sync/gmail", {
         method: "POST",
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error("Sync failed");
+        throw new Error(data.error || "Sync failed");
       }
-      setSyncMessage("Sync completed");
+
+      setSyncMessage(data.message || "Sync completed successfully");
+
       setTimeout(() => {
-        setSyncMessage("");
         window.location.reload();
       }, 1200);
-    } catch (error) {
-      console.error(error);
-      setSyncMessage("Sync failed");
+    } catch (err: any) {
+      console.error(err);
+      setSyncMessage(err.message || "Sync failed");
     } finally {
       setSyncing(false);
     }

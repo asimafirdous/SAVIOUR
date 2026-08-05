@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Image from "next/image";
+
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -15,23 +17,35 @@ export default function Navbar() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 py-4 sm:px-6">
       <div
-        className={`mx-auto flex max-w-7xl items-center justify-between rounded-2xl border px-4 py-3 shadow-lg transition-all duration-300 sm:px-6 ${
-          scrolled
-            ? "border-white/20 bg-white/75 backdrop-blur-2xl shadow-emerald-100/60"
-            : "border-white/40 bg-white/60 backdrop-blur-xl shadow-black/5"
-        }`}
+        className={`mx-auto flex max-w-7xl items-center justify-between rounded-2xl border px-4 py-3 shadow-lg transition-all duration-300 sm:px-6 ${scrolled
+          ? "border-white/20 bg-white/75 backdrop-blur-2xl shadow-emerald-100/60"
+          : "border-white/40 bg-white/60 backdrop-blur-xl shadow-black/5"
+          }`}
       >
-        <Link href="/" className="group flex items-center gap-3">
-          <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-lg text-white shadow-lg transition-transform duration-300 group-hover:scale-105">
-            <span className="absolute inset-0 rounded-2xl bg-white/20" />
-            🛡️
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-2xl bg-emerald-400/30 blur-lg opacity-70 transition-opacity duration-300 group-hover:opacity-100" />
+
+            <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-white ring-1 ring-emerald-100 shadow-lg transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-emerald-200/50">
+              <Image
+                src="/images/logo.png"
+                alt="SAVIOUR Logo"
+                width={34}
+                height={34}
+                className="object-contain"
+                priority
+              />
+            </div>
           </div>
 
           <div className="leading-tight">
-            <p className="font-semibold tracking-[0.18em] text-emerald-700">
+            <p className="text-lg font-black tracking-[0.18em] text-slate-900">
               SAVIOUR
             </p>
-            <p className="text-xs text-slate-500">AI Career Guardian</p>
+
+            <p className="text-xs font-medium text-emerald-600">
+              Career Intelligence
+            </p>
           </div>
         </Link>
 
@@ -51,10 +65,10 @@ export default function Navbar() {
           </a>
 
           <a
-            href="#students"
+            href="#built-for-students"
             className="text-sm font-medium text-slate-600 transition hover:text-emerald-700"
           >
-            Built for Students
+            Built For Students
           </a>
 
           <a
