@@ -38,7 +38,7 @@ export default async function InboxPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {emails.map((item) => (
+          {emails.map((item: (typeof emails)[number]) => (
             <div
               key={item.id}
               className="rounded-3xl bg-white border p-5 shadow-sm hover:shadow-md transition"
@@ -52,13 +52,12 @@ export default async function InboxPage() {
                 </div>
 
                 <span
-                  className={`px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap ${
-                    item.priority === "High"
+                  className={`px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap ${item.priority === "High"
                       ? "bg-red-100 text-red-700"
                       : item.priority === "Low"
-                      ? "bg-gray-100 text-gray-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
+                        ? "bg-gray-100 text-gray-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
                 >
                   {item.priority || "Medium"}
                 </span>
