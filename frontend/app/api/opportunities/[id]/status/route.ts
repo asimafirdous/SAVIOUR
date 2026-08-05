@@ -25,68 +25,31 @@ export async function PATCH(
       );
     }
 
-    let body = {};
-    try {
-      body = await req.json();
-    } catch {
-      return NextResponse.json(
-        { error: 'Invalid request body' },
-        { status: 400 }
-      );
-
-    }
-
-    const { status } = body as { status?: string };
-
-    if (!VALID_STATUSES.includes(status)) {
-      return NextResponse.json(
-        { error: "Invalid status" },
-        { status: 400 }
-      );
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+    const payload = await req.json();
+    const { status } = payload as { status?: string };
+    if (
+      typeof status !== "string" ||
+      !VALID_STATUSES.includes(status as (typeof VALID_STATUSES)[number])
+    ) {
+      return NextResponse.json({
+        error: "Invalid status"
+      }, {
+        status: 400
+      });
     }
 
     const { id } = await params;
-
-    const opportunity = await prisma.opportunity.findFirst({
-      where: {
-        id,
-        userId: user.id,
-      },
-    });
-
-    if (!opportunity) {
-      return NextResponse.json(
-        { error: "Opportunity not found" },
-        { status: 404 }
-      );
-    }
-
-    const updated = await prisma.opportunity.update({
+    const opportunity = await prisma.opportunity.update({
       where: { id },
       data: { status },
     });
-
-    return NextResponse.json({
-      success: true,
-      opportunity: updated,
-    });
+    return NextResponse.json(opportunity);
   } catch (error) {
     console.error(error);
-
-    return NextResponse.json(
-      { error: "Failed to update status" },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      error: "Failed to update status"
+    }, {
+      status: 500
+    });
   }
 }

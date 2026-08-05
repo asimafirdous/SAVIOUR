@@ -17,7 +17,7 @@ model User {
   googleId       String?
   profilePicture String?
   lastLoginAt    DateTime?
-  lastSyncAt DateTime?
+  lastSyncAt     DateTime?
 
   accounts Account[]
   sessions Session[]
@@ -31,42 +31,42 @@ model User {
 }
 
 model Email {
-  id String @id @default(cuid())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  gmailId String @unique
-
-  sender  String
-  subject String
-  content String?
-
-  category  String?
-  processed Boolean @default(false)
+  id             String  @id @default(cuid())
+  userId         String
+  gmailId        String  @unique
+  gmailUrl       String?
+  sender         String
+  subject        String
+  content        String
   summary        String?
   actionRequired String?
-  priority       String? @default("Medium")
+  priority       String?
+  processed      Boolean @default(false)
 
-  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id])
+
+  opportunities Opportunity[] @relation("EmailOpportunities")
+  createdAt     DateTime      @default(now())
 }
 
 model Opportunity {
-  id          String   @id @default(cuid())
-  userId      String
-  emailId     String?
-  company     String
-  title       String
-  sourceEmail String?
-  status      String
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  emailId String?
+  email   Email?  @relation("EmailOpportunities", fields: [emailId], references: [id])
+
+  company String
+  title   String
+  status  String @default("Applied")
+
   deadline    DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  sourceEmail String?
 
-  user  User  @relation(fields: [userId], references: [id])
-  email Email? @relation(fields: [emailId], references: [id])
-
-  @@unique([userId, company, title])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Reminder {
@@ -86,6 +86,7 @@ model Reminder {
   completed Boolean @default(false)
 
   createdAt DateTime @default(now())
+
   @@unique([userId, title])
 }
 

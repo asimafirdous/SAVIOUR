@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
+
 import {
   Sparkles,
   Inbox,
@@ -22,6 +24,9 @@ export default function DashboardClient({
   const [syncing, setSyncing] = useState(false);
   const [opportunities, setOpportunities] = useState(initialOpportunities);
   const [message, setMessage] = useState("");
+  const [syncMessage, setSyncMessage] = useState("");
+  const [calendarSyncing, setCalendarSyncing] = useState(false);
+  const [gmailOpening, setGmailOpening] = useState(false);
 
   const syncGmail = async () => {
     try {
@@ -31,28 +36,19 @@ export default function DashboardClient({
       const res = await fetch("/api/sync/gmail", {
         method: "POST",
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Sync failed");
-      }
-      setMessage(data.message || "Sync complete");
-      window.location.reload();
 
-      // Poll every 3 seconds for updates
-      const start = Date.now();
-      const poll = async () => {
-        const res = await fetch("/api/auth/session");
-        if (res.ok) {
-          // Refresh dashboard data
-          window.location.reload();
-        } else if (Date.now() - start < 30000) {
-          setTimeout(poll, 3000);
-        }
-      };
-      setTimeout(poll, 3000);
+      if (!res.ok) {
+        throw new Error("Sync failed");
+      }
+      setSyncMessage("Sync completed");
+      setTimeout(() => {
+        setSyncMessage("");
+        window.location.reload();
+      }, 1200);
     } catch (error) {
       console.error(error);
-      setMessage("Failed to start sync");
+      setSyncMessage("Sync failed");
+    } finally {
       setSyncing(false);
     }
   };
@@ -125,6 +121,11 @@ export default function DashboardClient({
             {message}
           </div>
         )}
+        {syncMessage && (
+          <div className="rounded-2xl bg-blue-50 border border-blue-100 px-4 py-3 text-sm text-blue-700">
+            {syncMessage}
+          </div>
+        )}
       </div>
 
       <section className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 p-8 text-white shadow-xl">
@@ -190,9 +191,21 @@ export default function DashboardClient({
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold truncate">
-                      {item.subject}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2">
+                        {item.gmailUrl ? (
+                          <a href={item.gmailUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-semibold truncate text-gray-900 hover:text-emerald-700 hover:underline transition-colors block" >
+                            {item.subject}
+                          </a>
+                        ) : (
+                          <p className="font-semibold truncate">
+                            {item.subject} </p>
+                        )}
+                      </div>
+                    </div>
 
                     <p className="text-sm text-gray-500 truncate mt-1">
                       {item.sender}

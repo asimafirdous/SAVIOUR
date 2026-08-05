@@ -360,7 +360,7 @@ export async function POST() {
     const list = await gmail.users.messages.list({
       userId: "me",
       q: query.replace(/\\s+/g, " ").trim(),
-      maxResults: 25,
+      maxResults: 10,
     });
 
     const messages = list.data.messages || [];
@@ -425,10 +425,12 @@ export async function POST() {
           summary: aiEmail.summary,
           actionRequired: aiEmail.actionRequired,
           priority: aiEmail.priority,
+          gmailUrl: `https://mail.google.com/mail/u/0/#all/${message.id}`,
         },
         create: {
           userId: user.id,
           gmailId: message.id,
+          gmailUrl: `https://mail.google.com/mail/u/0/#all/${message.id}`,
           sender: from,
           subject,
           content: body,

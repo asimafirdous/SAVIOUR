@@ -5,11 +5,15 @@ import { getGmailClient } from "@/lib/gmail";
 export async function POST() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.accessToken) {
+  // session may not have a typed `accessToken` property depending on NextAuth setup.
+  // Try common locations and fall back safely.
+  const accessToken = (session as any)?.accessToken ?? (session as any)?.user?.accessToken;
+
+  if (!accessToken) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const gmail = getGmailClient(session.accessToken);
+  const gmail = getGmailClient(accessToken);
 
   const res = await gmail.users.messages.list({
     userId: "me",
