@@ -37,12 +37,12 @@ export default async function RemindersPage() {
 
   const now = new Date();
 
-  const today = reminders.filter((r) => {
+  const today = reminders.filter((r: (typeof reminders)[number]) => {
     if (!r.dueDate) return false;
     return r.dueDate.toDateString() === now.toDateString();
   });
 
-  const upcoming = reminders.filter((r) => {
+  const upcoming = reminders.filter((r: (typeof reminders)[number]) => {
     if (!r.dueDate) return false;
     return r.dueDate > now && r.dueDate.toDateString() !== now.toDateString();
   });
@@ -70,7 +70,7 @@ export default async function RemindersPage() {
           <p className="text-sm text-gray-500">No reminders for today.</p>
         ) : (
           <div className="space-y-3">
-            {today.map((item) => (
+            {today.map((item: (typeof reminders)[number]) => (
               <div
                 key={item.id}
                 className="rounded-2xl border p-4 flex items-center justify-between gap-4"
@@ -85,13 +85,12 @@ export default async function RemindersPage() {
                 </div>
 
                 <span
-                  className={`px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap ${
-                    item.priority === "High"
-                      ? "bg-red-100 text-red-700"
-                      : item.priority === "Medium"
+                  className={`px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap ${item.priority === "High"
+                    ? "bg-red-100 text-red-700"
+                    : item.priority === "Medium"
                       ? "bg-yellow-100 text-yellow-700"
                       : "bg-gray-100 text-gray-700"
-                  }`}
+                    }`}
                 >
                   {item.priority}
                 </span>
@@ -109,7 +108,7 @@ export default async function RemindersPage() {
           <p className="text-sm text-gray-500">No upcoming reminders.</p>
         ) : (
           <div className="space-y-3">
-            {upcoming.map((item) => (
+            {upcoming.map((item: (typeof reminders)[number]) => (
               <div
                 key={item.id}
                 className="rounded-2xl border p-4 flex items-center justify-between gap-4"
@@ -124,13 +123,12 @@ export default async function RemindersPage() {
                 </div>
 
                 <span
-                  className={`px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap ${
-                    item.priority === "High"
-                      ? "bg-red-100 text-red-700"
-                      : item.priority === "Medium"
+                  className={`px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap ${item.priority === "High"
+                    ? "bg-red-100 text-red-700"
+                    : item.priority === "Medium"
                       ? "bg-yellow-100 text-yellow-700"
                       : "bg-gray-100 text-gray-700"
-                  }`}
+                    }`}
                 >
                   {item.priority}
                 </span>
