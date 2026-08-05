@@ -69,8 +69,9 @@ export default async function OpportunitiesPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
           {columns.map((status) => {
-            const items = opportunities.filter((o) => o.status === status);
-
+            const items = opportunities.filter(
+              (o: (typeof opportunities)[number]) => o.status === status
+            );
             return (
               <section
                 key={status}
