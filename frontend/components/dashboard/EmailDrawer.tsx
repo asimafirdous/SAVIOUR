@@ -1,12 +1,48 @@
 "use client";
 
 import { X, ExternalLink, Bell, Sparkles, Calendar } from "lucide-react";
+import { useState } from "react";
 
 export default function EmailDrawer({
   open,
   onClose,
   email,
 }: any) {
+  const [creating, setCreating] = useState(false);
+
+  const createReminder = async () => {
+    try {
+      setCreating(true);
+
+      const res = await fetch("/api/reminders/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: email.actionRequired || email.subject,
+          dueDate: email.deadlineText || null,
+          priority: email.priority || "Medium",
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create reminder");
+      }
+
+      onClose();
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    } catch (err) {
+      console.error(err);
+      alert("Could not create reminder");
+    } finally {
+      setCreating(false);
+    }
+  };
+
   if (!open || !email) return null;
 
   return (
@@ -99,9 +135,13 @@ export default function EmailDrawer({
               </a>
             )}
 
-            <button className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-gray-50 transition">
+            <button
+              onClick={createReminder}
+              disabled={creating}
+              className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-gray-50 transition disabled:opacity-60"
+            >
               <Bell size={16} />
-              Create Reminder
+              {creating ? "Creating..." : "Create Reminder"}
             </button>
           </div>
         </div>
