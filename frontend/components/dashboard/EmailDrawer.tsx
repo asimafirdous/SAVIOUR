@@ -21,13 +21,14 @@ export default function EmailDrawer({
         },
         body: JSON.stringify({
           title: email.actionRequired || email.subject,
-          dueDate: email.deadlineText || null,
+          dueDate: null,
           priority: email.priority || "Medium",
         }),
       });
 
       if (!res.ok) {
-        throw new Error("Failed to create reminder");
+        const data = await res.json();
+        throw new Error(data.error || "Failed to create reminder");
       }
 
       onClose();
@@ -35,9 +36,9 @@ export default function EmailDrawer({
       setTimeout(() => {
         window.location.reload();
       }, 300);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Could not create reminder");
+      alert(err.message);
     } finally {
       setCreating(false);
     }

@@ -31,7 +31,9 @@ export async function POST(req: Request) {
       data: {
         userId: user.id,
         title: body.title,
-        dueDate: body.dueDate ? new Date(body.dueDate) : null,
+        dueDate: body.dueDate && !isNaN(new Date(body.dueDate).getTime())
+          ? new Date(body.dueDate)
+          : null,
         priority: body.priority || "Medium",
         completed: false,
       },

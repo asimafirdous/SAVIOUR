@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import Timeline from "@/components/dashboard/Timeline";
 import EmailDrawer from "@/components/dashboard/EmailDrawer";
+import CalendarAgenda from "@/components/dashboard/CalendarAgenda";
 
 import {
   Sparkles,
@@ -179,6 +180,11 @@ export default function DashboardClient({
       {/* Timeline */}
       <div className="mt-8">
         <Timeline items={timelineItems} />
+      </div>
+
+      {/* Calendar */}
+      <div className="mt-8">
+        <CalendarAgenda items={timelineItems} />
       </div>
 
       <section className="rounded-3xl bg-white border p-6 shadow-sm">
