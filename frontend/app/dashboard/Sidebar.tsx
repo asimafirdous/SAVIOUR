@@ -29,13 +29,11 @@ export default function Sidebar({ session }: any) {
   return (
     <aside className="hidden md:flex w-72 flex-col border-r bg-white/80 backdrop-blur-xl">
       <div className="flex items-center gap-3 px-6 py-6">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-xl text-white shadow-lg">
-          🛡️
-        </div>
+
 
         <div>
           <h1 className="font-bold tracking-widest">SAVIOUR</h1>
-          <p className="text-xs text-gray-500">Career Intelligence</p>
+          <p className="text-xs text-gray-500">Your career saver</p>
         </div>
       </div>
 
@@ -48,11 +46,10 @@ export default function Sidebar({ session }: any) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${
-                active
+              className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${active
                   ? "bg-emerald-50 text-emerald-700"
                   : "text-gray-600 hover:bg-gray-50"
-              }`}
+                }`}
             >
               <Icon size={18} />
               {item.label}

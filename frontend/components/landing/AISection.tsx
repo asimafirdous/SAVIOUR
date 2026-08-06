@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function AISection() {
   return (
     <section className="relative overflow-hidden px-6 py-24">
@@ -21,14 +23,24 @@ export default function AISection() {
         <div className="mt-14 flex justify-center">
           <div className="glass w-full max-w-2xl overflow-hidden rounded-[32px] border border-white/40 shadow-2xl shadow-emerald-100/40">
             <div className="border-b border-emerald-100 bg-white/60 px-6 py-5 backdrop-blur-md">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-xl text-white shadow-lg shadow-emerald-500/25">
-                  ✨
+              <div className="flex items-center gap-3">
+                <div className="relative shrink-0">
+                  <div className="absolute inset-0 rounded-xl bg-emerald-400/25 blur-md" />
+
+                  <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white ring-1 ring-emerald-100 shadow-md">
+                    <Image
+                      src="/images/logo.png"
+                      alt="SAVIOUR AI"
+                      width={22}
+                      height={22}
+                      className="object-contain"
+                    />
+                  </div>
                 </div>
 
-                <div>
+                <div className="min-w-0">
                   <p className="font-semibold text-slate-900">SAVIOUR AI</p>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-600">
                     Your personal career assistant
                   </p>
                 </div>

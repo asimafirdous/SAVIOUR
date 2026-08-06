@@ -10,8 +10,9 @@ export const authOptions: NextAuthOptions = {
       authorization: {
         params: {
           access_type: "offline",
-          scope: "openid email profile https://www.googleapis.com/auth/gmail.readonly",
-          prompt: 'consent',
+          scope:
+            "openid email profile https://www.googleapis.com/auth/gmail.readonly",
+          prompt: "consent",
         },
       },
     }),
@@ -25,8 +26,8 @@ export const authOptions: NextAuthOptions = {
 
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60,   // refresh token every 24h
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
   },
 
   jwt: {
@@ -61,7 +62,6 @@ export const authOptions: NextAuthOptions = {
             providerAccountId: account.providerAccountId,
           },
         },
-
         update: {
           access_token: account.access_token,
           refresh_token: account.refresh_token,
@@ -70,7 +70,6 @@ export const authOptions: NextAuthOptions = {
           token_type: account.token_type,
           id_token: account.id_token,
         },
-
         create: {
           userId: dbUser.id,
           type: "oauth",
@@ -108,22 +107,6 @@ export const authOptions: NextAuthOptions = {
       }
 
       return session;
-    },
-  },
-
-  cookies: {
-    sessionToken: {
-      name:
-        process.env.NODE_ENV === "production"
-          ? "__Secure-next-auth.session-token"
-          : "next-auth.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 30 * 24 * 60 * 60,
-      },
     },
   },
 
