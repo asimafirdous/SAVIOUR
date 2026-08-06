@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import Timeline from "@/components/dashboard/Timeline";
+import EmailDrawer from "@/components/dashboard/EmailDrawer";
 
 import {
   Sparkles,
@@ -19,6 +21,7 @@ export default function DashboardClient({
   emails = [],
   reminders = [],
   stats,
+  timelineItems = [],
   lastSyncAt,
 }: any) {
   const [syncing, setSyncing] = useState(false);
@@ -27,6 +30,8 @@ export default function DashboardClient({
   const [syncMessage, setSyncMessage] = useState("");
   const [calendarSyncing, setCalendarSyncing] = useState(false);
   const [gmailOpening, setGmailOpening] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState<any>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const syncGmail = async () => {
     try {
@@ -85,6 +90,11 @@ export default function DashboardClient({
     }
   };
 
+  const openEmail = (email: any) => {
+    setSelectedEmail(email);
+    setDrawerOpen(true);
+  };
+
   return (
     <div className="px-4 py-4 sm:px-6 max-w-7xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
@@ -137,7 +147,7 @@ export default function DashboardClient({
           className="absolute right-6 top-6 opacity-20"
         />
 
-        <p className="text-emerald-100">SAVIOUR AI ENGINE</p>
+        <p className="text-emerald-100">SAVIOUR AI</p>
 
         <h2 className="mt-3 text-3xl md:text-4xl font-bold leading-tight">
           Never miss your next opportunity again.
@@ -166,6 +176,11 @@ export default function DashboardClient({
         </div>
       </section>
 
+      {/* Timeline */}
+      <div className="mt-8">
+        <Timeline items={timelineItems} />
+      </div>
+
       <section className="rounded-3xl bg-white border p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -188,19 +203,23 @@ export default function DashboardClient({
             </p>
           ) : (
             emails.map((item: any) => (
-              <div
+              <button
                 key={item.id}
-                className="rounded-2xl border p-4 hover:bg-gray-50 transition"
+                onClick={() => openEmail(item)}
+                className="w-full text-left rounded-2xl border p-4 hover:bg-gray-50 transition focus:outline-none focus:ring-2 focus:ring-emerald-200"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-2">
                         {item.gmailUrl ? (
-                          <a href={item.gmailUrl}
+                          <a
+                            href={item.gmailUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-semibold truncate text-gray-900 hover:text-emerald-700 hover:underline transition-colors block" >
+                            onClick={(e) => e.stopPropagation()}
+                            className="font-semibold truncate text-gray-900 hover:text-emerald-700 hover:underline transition-colors block"
+                          >
                             {item.subject}
                           </a>
                         ) : (
@@ -238,7 +257,7 @@ export default function DashboardClient({
                     </p>
                   </div>
                 )}
-              </div>
+              </button>
             ))
           )}
         </div>
@@ -363,6 +382,11 @@ export default function DashboardClient({
           </div>
         </section>
       </div>
+      <EmailDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        email={selectedEmail}
+      />
     </div>
   );
 }

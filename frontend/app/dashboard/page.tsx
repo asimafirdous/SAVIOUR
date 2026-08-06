@@ -60,6 +60,36 @@ export default async function DashboardPage() {
     }),
   };
 
+  const timelineItems = opportunities
+    .filter((o) => o.deadline)
+    .slice(0, 5)
+    .map((o) => ({
+      id: o.id,
+      title: o.title,
+      subtitle: o.company,
+      type:
+        o.status === "Interview"
+          ? ("interview" as const)
+          : ("internship" as const),
+      date: (() => {
+        const d = new Date(o.deadline!);
+        const now = new Date();
+
+        const diff = Math.ceil(
+          (d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+        );
+
+        if (diff <= 0) return "Today";
+        if (diff === 1) return "Tomorrow";
+        if (diff <= 7) return `In ${diff} days`;
+
+        return d.toLocaleDateString("en-IN", {
+          day: "numeric",
+          month: "short",
+        });
+      })(),
+    }));
+
   return (
     <DashboardClient
       session={session}
@@ -67,6 +97,7 @@ export default async function DashboardPage() {
       emails={emails}
       reminders={reminders}
       stats={stats}
+      timelineItems={timelineItems}
       lastSyncAt={user.lastSyncAt?.toISOString() ?? null}
     />
   );
