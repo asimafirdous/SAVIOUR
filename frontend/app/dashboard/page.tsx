@@ -71,6 +71,10 @@ export default async function DashboardPage() {
         o.status === "Interview"
           ? ("interview" as const)
           : ("internship" as const),
+
+      source: "career",
+      url: null,
+
       date: (() => {
         const d = new Date(o.deadline!);
         const now = new Date();

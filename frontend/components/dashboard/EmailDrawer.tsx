@@ -27,8 +27,9 @@ export default function EmailDrawer({
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to create reminder");
+        const text = await res.text();
+        console.error("API error:", text);
+        throw new Error(text || "Failed to create reminder");
       }
 
       onClose();

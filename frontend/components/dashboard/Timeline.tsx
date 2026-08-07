@@ -1,4 +1,5 @@
 import { CalendarDays, Clock, Briefcase, Trophy, GraduationCap, Video } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 type TimelineItem = {
   id: string;
@@ -6,6 +7,7 @@ type TimelineItem = {
   type: "internship" | "oa" | "interview" | "hackathon" | "scholarship" | "other";
   date: string;
   subtitle?: string | null;
+  source?: "linkedin" | "gmail" | "hackathon" | "company" | "career";
 };
 
 function getIcon(type: TimelineItem["type"]) {
@@ -78,11 +80,28 @@ export default function Timeline({ items }: { items: TimelineItem[] }) {
             {/* content */}
             <div className="card-3d flex-1 rounded-3xl p-4 sm:p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0">
-                  <p className="font-semibold text-slate-900">{item.title}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-slate-900 truncate">
+                    {item.title}
+                  </p>
+
                   {item.subtitle && (
-                    <p className="mt-1 text-sm text-slate-600">{item.subtitle}</p>
+                    <p className="text-sm text-slate-600 mt-1 truncate">
+                      {item.subtitle}
+                    </p>
                   )}
+
+                  <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
+                    {item.source === "linkedin"
+                      ? "LinkedIn"
+                      : item.source === "gmail"
+                        ? "Gmail"
+                        : item.source === "hackathon"
+                          ? "Hackathon"
+                          : item.source === "company"
+                            ? "Company"
+                            : "Career"}
+                  </div>
                 </div>
 
                 <div className="inline-flex items-center gap-2 rounded-full bg-slate-50 px-3 py-1 text-sm text-slate-600">
