@@ -161,7 +161,7 @@ export default function DashboardClient({
 
   return (
     <div className="px-4 py-4 sm:px-6 max-w-7xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-gray-500">Welcome back</p>
 
@@ -205,25 +205,25 @@ export default function DashboardClient({
         )}
       </div>
 
-      <section className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 p-8 text-white shadow-xl">
+      <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 p-5 sm:p-8 text-white shadow-xl">
         <Sparkles
-          size={72}
-          className="absolute right-6 top-6 opacity-20"
+          size={64}
+          className="absolute right-4 top-4 opacity-20 sm:right-6 sm:top-6"
         />
 
-        <p className="text-emerald-100">SAVIOUR AI</p>
+        <p className="text-sm text-emerald-100 sm:text-base">SAVIOUR AI</p>
 
-        <h2 className="mt-3 text-3xl md:text-4xl font-bold leading-tight">
+        <h2 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
           Never miss your next opportunity again.
         </h2>
 
-        <p className="mt-4 max-w-2xl text-emerald-50">
+        <p className="mt-4 max-w-2xl text-sm leading-6 text-emerald-50 sm:text-base sm:leading-7">
           SAVIOUR converts your Gmail into an intelligent career assistant
           that tracks internships, interviews and deadlines automatically.
         </p>
       </section>
 
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-3xl bg-white border p-6 shadow-sm">
           <p className="text-3xl font-bold">{stats.opportunities}</p>
           <p className="text-gray-500 mt-2">Opportunities</p>
