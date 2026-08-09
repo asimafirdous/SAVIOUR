@@ -255,7 +255,7 @@ export default function DashboardClient({
           </div>
 
           <div className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
-            {timelineItems.length} items
+            {timelineItems.length} {timelineItems.length === 1 ? "item" : "items"}
           </div>
         </div>
 
@@ -329,11 +329,11 @@ export default function DashboardClient({
           </button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {opportunityHub.map((item) => (
             <div
               key={item.title}
-              className="rounded-2xl border p-5 hover:shadow-md transition bg-white"
+              className="rounded-2xl border p-4 sm:p-5 hover:shadow-md transition bg-white"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
@@ -452,7 +452,7 @@ export default function DashboardClient({
               <button
                 key={item.id}
                 onClick={() => openEmail(item)}
-                className="w-full text-left rounded-2xl border p-4 hover:bg-gray-50 transition focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                className="w-full text-left rounded-2xl border p-4 sm:p-5 hover:bg-gray-50 transition focus:outline-none focus:ring-2 focus:ring-emerald-200"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
@@ -481,14 +481,13 @@ export default function DashboardClient({
                   </div>
 
                   <span
-                    className={`px-3 py-1 text-xs font-medium rounded-xl ${item.priority === "High"
-                      ? "bg-red-100 text-red-700"
-                      : item.priority === "Low"
-                        ? "bg-gray-100 text-gray-700"
-                        : "bg-yellow-100 text-yellow-700"
+                    className={`self-start sm:self-auto px-3 py-1 text-xs font-medium rounded-xl ${item.priority === "High"
+                        ? "bg-red-100 text-red-700"
+                        : item.priority === "Low"
+                          ? "bg-gray-100 text-gray-700"
+                          : "bg-yellow-100 text-yellow-700"
                       }`}
-                  >
-                    {item.priority || "Medium"}
+                  >riority || "Medium"}
                   </span>
                 </div>
 
@@ -608,7 +607,7 @@ export default function DashboardClient({
                   key={item.id}
                   className="rounded-2xl border p-4 hover:bg-gray-50 transition"
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold truncate">
                         {item.title}

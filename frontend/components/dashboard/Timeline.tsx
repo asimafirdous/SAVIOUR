@@ -47,7 +47,7 @@ function getColor(type: TimelineItem["type"]) {
 export default function Timeline({ items }: { items: TimelineItem[] }) {
   return (
     <div className="rounded-3xl bg-white border p-6 shadow-sm">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 rounded-2xl border p-4 hover:shadow-md transition sm:flex-row sm:items-start">
         <div>
           <h2 className="text-xl font-bold text-slate-900">Upcoming Timeline</h2>
           <p className="mt-1 text-sm text-slate-600">
