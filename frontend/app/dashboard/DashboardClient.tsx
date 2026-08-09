@@ -487,26 +487,29 @@ export default function DashboardClient({
                           ? "bg-gray-100 text-gray-700"
                           : "bg-yellow-100 text-yellow-700"
                       }`}
-                  >riority || "Medium"}
+                  >
+                    {item.priority || "Medium"}
                   </span>
                 </div>
 
-                {item.actionRequired && (
-                  <div className="mt-3 rounded-xl bg-emerald-50 p-3">
-                    <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">
-                      AI Action
-                    </p>
+                {
+                  item.actionRequired && (
+                    <div className="mt-3 rounded-xl bg-emerald-50 p-3">
+                      <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">
+                        AI Action
+                      </p>
 
-                    <p className="text-sm text-emerald-900 mt-1">
-                      {item.actionRequired}
-                    </p>
-                  </div>
-                )}
+                      <p className="text-sm text-emerald-900 mt-1">
+                        {item.actionRequired}
+                      </p>
+                    </div>
+                  )
+                }
               </button>
             ))
           )}
         </div>
-      </section>
+      </section >
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <section className="rounded-3xl bg-white border p-6 shadow-sm">
@@ -640,6 +643,6 @@ export default function DashboardClient({
         onClose={() => setDrawerOpen(false)}
         email={selectedEmail}
       />
-    </div>
+    </div >
   );
 }
