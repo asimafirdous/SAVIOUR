@@ -61,7 +61,20 @@ export default async function DashboardPage() {
   };
 
   const timelineItems = opportunities
-    .filter((o) => o.deadline)
+    .filter((o) => {
+      if (!o.deadline) return false;
+
+      const text = `${o.title} ${o.company}`.toLowerCase();
+
+      return (
+        !text.includes("invitation") &&
+        !text.includes("sync call") &&
+        !text.includes("zoom") &&
+        !text.includes("google meet") &&
+        !text.includes("gmeet") &&
+        !text.includes("meeting")
+      );
+    })
     .slice(0, 5)
     .map((o) => ({
       id: o.id,

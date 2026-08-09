@@ -456,32 +456,30 @@ export default function DashboardClient({
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-2">
-                        {item.gmailUrl ? (
-                          <a
-                            href={item.gmailUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="flex items-center gap-1 font-semibold truncate text-gray-900 hover:text-emerald-700 hover:underline transition-colors"
-                          >
-                            <span className="truncate">{item.subject}</span>
-                            <ExternalLink size={14} className="shrink-0 opacity-60" />
-                          </a>
-                        ) : (
-                          <p className="font-semibold truncate">{item.subject}</p>
-                        )}
-                      </div>
-                    </div>
+                    {item.gmailUrl ? (
+                      <a
+                        href={item.gmailUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1 font-semibold text-slate-900 hover:text-emerald-700 hover:underline transition-colors"
+                      >
+                        <span className="truncate">{item.subject}</span>
+                        <ExternalLink size={14} className="shrink-0 opacity-60" />
+                      </a>
+                    ) : (
+                      <p className="font-semibold text-slate-900 truncate">
+                        {item.subject}
+                      </p>
+                    )}
 
-                    <p className="text-sm text-gray-500 truncate mt-1">
+                    <p className="text-sm text-slate-500 truncate mt-1">
                       {item.sender}
                     </p>
                   </div>
 
                   <span
-                    className={`self-start sm:self-auto px-3 py-1 text-xs font-medium rounded-xl ${item.priority === "High"
+                    className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${item.priority === "High"
                         ? "bg-red-100 text-red-700"
                         : item.priority === "Low"
                           ? "bg-gray-100 text-gray-700"
@@ -494,7 +492,7 @@ export default function DashboardClient({
 
                 {
                   item.actionRequired && (
-                    <div className="mt-3 rounded-xl bg-emerald-50 p-3">
+                    <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-3">
                       <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">
                         AI Action
                       </p>
