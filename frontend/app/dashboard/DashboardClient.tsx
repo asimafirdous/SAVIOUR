@@ -246,7 +246,7 @@ export default function DashboardClient({
       </div>
 
       <section className="rounded-3xl bg-white border p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-xl font-bold text-slate-900">Upcoming Agenda</h3>
             <p className="text-sm text-slate-500 mt-1">
@@ -298,7 +298,7 @@ export default function DashboardClient({
       </section>
 
       <section className="mt-8 rounded-3xl bg-white border p-6 shadow-sm">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-xl font-bold text-slate-900">Opportunities Hub</h3>
             <p className="text-sm text-slate-500 mt-1">
@@ -367,7 +367,7 @@ export default function DashboardClient({
 
       {/* Meetings & Interviews */}
       <section className="rounded-3xl bg-white border p-6 shadow-sm">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
               <Calendar size={20} />
@@ -428,7 +428,7 @@ export default function DashboardClient({
       </section>
 
       <section className="rounded-3xl bg-white border p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <Inbox className="text-emerald-600" size={24} />
             <h3 className="text-xl font-bold">Smart Inbox</h3>
@@ -511,7 +511,7 @@ export default function DashboardClient({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <section className="rounded-3xl bg-white border p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <Briefcase className="text-emerald-600" size={24} />
               <div>
@@ -583,7 +583,7 @@ export default function DashboardClient({
         </section>
 
         <section className="rounded-3xl bg-white border p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <Bell className="text-emerald-600" size={24} />
               <h3 className="text-xl font-bold">Reminders</h3>

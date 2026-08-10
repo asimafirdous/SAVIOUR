@@ -175,3 +175,12 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(5,150,105,0.35);
 }
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
