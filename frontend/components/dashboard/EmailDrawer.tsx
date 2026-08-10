@@ -10,6 +10,8 @@ export default function EmailDrawer({
 }: any) {
   const [creating, setCreating] = useState(false);
 
+  if (!open || !email) return null;
+
   const createReminder = async () => {
     try {
       setCreating(true);
@@ -45,7 +47,31 @@ export default function EmailDrawer({
     }
   };
 
-  if (!open || !email) return null;
+  const addToSaveLine = async () => {
+    try {
+      const res = await fetch("/api/saveline/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: email.subject,
+          company: email.sender,
+          subject: email.subject,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to add to SaveLine");
+      }
+
+      onClose();
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add to SaveLine");
+    }
+  };
 
   return (
     <>
@@ -123,29 +149,37 @@ export default function EmailDrawer({
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <button
+              onClick={addToSaveLine}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition"
+            >
+              Save to SaveLine
+            </button>
+
+            <button
+              onClick={createReminder}
+              disabled={creating}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700 transition disabled:opacity-60"
+            >
+              <Bell size={16} />
+              {creating ? "Creating..." : "Create Reminder"}
+            </button>
+
             {email.gmailUrl && (
               <a
                 href={email.gmailUrl}
                 target="_blank"
                 rel="noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700 transition"
+                className="sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-gray-50 transition"
               >
                 <ExternalLink size={16} />
                 Open in Gmail
               </a>
             )}
-
-            <button
-              onClick={createReminder}
-              disabled={creating}
-              className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-gray-50 transition disabled:opacity-60"
-            >
-              <Bell size={16} />
-              {creating ? "Creating..." : "Create Reminder"}
-            </button>
           </div>
+
         </div>
       </div>
     </>
